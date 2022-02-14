@@ -109,6 +109,60 @@ public class Model extends Observable {
     public void check_move(Tile tile) {
 
     }
+
+    /* helper goes through all the rows in the columns and does the moves / merges */
+    public boolean column_helper (Board b, int col) {
+        boolean changed_tracker = false;
+        int up_to_row = b.size() - 1;
+        for (int row = (b.size() - 2); row >= 0; row -= 1) {
+            boolean move = false;
+            int destination_row = row;
+            Tile t = b.tile(col, row);
+            if (t == null) {
+                continue; /* go to next tile */
+            } else {
+                /* assign the tile_above to observe */
+                /* if tile above row exceeds the up_to, you're done - nothing left to do with this tile */
+                if (row + 1 > up_to_row) {
+                    break;
+                }
+                Tile tile_above = b.tile(col, row + 1);
+                /* now you've assigned a tile_above -- we check against it for next steps */
+                while (true) {
+                    if (tile_above == null) {
+                        destination_row = destination_row + 1;
+                        move = true;
+                        /* if you've reached the top row OR if you've reached up_to_row */
+                        if (destination_row == b.size() - 1 || destination_row == up_to_row) {
+                            break;
+                        }
+                    } else if (tile_above.value() == t.value()) {
+                        move = true;
+                        destination_row = tile_above.row();
+                        break;
+                    }
+                    else {
+                        break;
+                    }
+                    tile_above = b.tile(col, destination_row + 1);
+                    continue;
+                }
+            }
+            if (move == true) {
+                if (this.board.move(col, destination_row, t) == true) { /* if merge happened */
+                    this.score += tile(col, destination_row).value();
+                    up_to_row = destination_row - 1;
+                    changed_tracker = true;
+                }
+            }
+        }
+        if (changed_tracker = true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
@@ -117,46 +171,14 @@ public class Model extends Observable {
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
         if (side == Side.NORTH) {
-            for (int row = (this.board.size() - 2); row >= 0; row -= 1) {
-                for (int col = 0; col < this.board.size(); col += 1) {
-                    boolean move = false;
-                    int destination_row = row;
-                    Tile t = this.board.tile(col, row);
-                    if (t == null) {
-                        continue; /* go to next tile */
-                    } else {
-                        Tile tile_above = this.board.tile(col, row + 1);
-                        while (true) {
-                            if (tile_above == null) {
-                                destination_row = destination_row + 1;
-                                move = true;
-                                if (destination_row == this.board.size() - 1) {
-                                    break;
-                                }
-                            } else if (tile_above.value() == t.value()) {
-                                move = true;
-                                destination_row = tile_above.row();
-                                break;
-                            }
-                            else {
-                                break;
-                            }
-                            tile_above = this.board.tile(col, destination_row + 1);
-                            continue;
-                        }
-                    }
-                    if (move == true) {
-                        changed = true;
-                        if (this.board.move(col, destination_row, t) == true) {
-                            this.score += tile(col, destination_row).value();
-                            int up_to_row = destination_row - 1;
-                            System.out.println(up_to_row);
-                        }
-                    }
+            for (int col = 0; col < this.board.size(); col += 1) {
+                if (column_helper(this.board, col) == true) { /* this calls column_helper while also checking its return */
+                    changed = true;
+                    System.out.println(col);
+                    System.out.println(this.board);
                 }
             }
         }
-
         checkGameOver();
         if (changed) {
             setChanged();
