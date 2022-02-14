@@ -113,6 +113,12 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+        for (int col = 0; col < board.size(); col += 1) {
+            for (int row = 0; row < board.size(); row += 1) {
+                Tile t = board.tile(col, row);
+                if
+            }
+        }
 
         checkGameOver();
         if (changed) {
@@ -138,6 +144,13 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for (int column = 0; column < b.size(); column += 1) {
+            for (int row = 0; row < b.size(); row += 1) {
+                if (b.tile(column, row) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -148,6 +161,15 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for (int column = 0; column < b.size(); column += 1) {
+            for (int row = 0; row < b.size(); row += 1) {
+                if (b.tile(column, row) != null) {
+                    if ((b.tile(column, row).value()) == MAX_PIECE) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -157,8 +179,59 @@ public class Model extends Observable {
      * 1. There is at least one empty space on the board.
      * 2. There are two adjacent tiles with the same value.
      */
+
+    public static boolean adjacentTileCheck(Board b) {
+        for (int column = 0; column < b.size(); column += 1) {
+            for (int row = 0; row < b.size(); row += 1) {
+                int left_tile;
+                int right_tile;
+                int above_tile;
+                int below_tile;
+
+                if (b.tile(column, row) != null) {
+                    int current_tile = b.tile(column, row).value();
+                    if (column != 0) {
+                        left_tile = b.tile((column - 1), row).value();
+                    } else {
+                        left_tile = 0;
+                    }
+                    if (column != (b.size() - 1)) {
+                        right_tile = b.tile((column + 1), row).value();
+                    } else {
+                        right_tile = 0;
+                    }
+                    if (row != (b.size() -1)) {
+                        below_tile = b.tile(column, (row + 1)).value();
+                    } else {
+                        below_tile = 0;
+                    }
+                    if (row != 0) {
+                        above_tile = b.tile(column, (row - 1)).value();
+                    } else {
+                        above_tile = 0;
+                    }
+                    if (current_tile == left_tile || current_tile == right_tile || current_tile == below_tile || current_tile == above_tile) {
+                        return true;
+                    }
+
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean atLeastOneMoveExists(Board b) {
         // TODO: Fill in this function.
+        /*check for one empty space on the board */
+        if (Model.maxTileExists(b) == true) {
+            return true;
+        }
+        if (Model.emptySpaceExists(b) == true){
+            return true;
+        }
+        if (Model.adjacentTileCheck(b) == true){
+            return true;
+        }
         return false;
     }
 
