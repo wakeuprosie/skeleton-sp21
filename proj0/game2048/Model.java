@@ -106,6 +106,9 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+    public void check_move(Tile tile) {
+
+    }
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
@@ -113,10 +116,44 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-        for (int col = 0; col < board.size(); col += 1) {
-            for (int row = 0; row < board.size(); row += 1) {
-                Tile t = board.tile(col, row);
-                if
+        if (side == Side.NORTH) {
+            for (int row = (this.board.size() - 2); row >= 0; row -= 1) {
+                for (int col = 0; col < this.board.size(); col += 1) {
+                    boolean move = false;
+                    int destination_row = row;
+                    Tile t = this.board.tile(col, row);
+                    if (t == null) {
+                        continue; /* go to next tile */
+                    } else {
+                        Tile tile_above = this.board.tile(col, row + 1);
+                        while (true) {
+                            if (tile_above == null) {
+                                destination_row = destination_row + 1;
+                                move = true;
+                                if (destination_row == this.board.size() - 1) {
+                                    break;
+                                }
+                            } else if (tile_above.value() == t.value()) {
+                                move = true;
+                                destination_row = tile_above.row();
+                                break;
+                            }
+                            else {
+                                break;
+                            }
+                            tile_above = this.board.tile(col, destination_row + 1);
+                            continue;
+                        }
+                    }
+                    if (move == true) {
+                        changed = true;
+                        if (this.board.move(col, destination_row, t) == true) {
+                            this.score += tile(col, destination_row).value();
+                            int up_to_row = destination_row - 1;
+                            System.out.println(up_to_row);
+                        }
+                    }
+                }
             }
         }
 
