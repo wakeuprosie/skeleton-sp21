@@ -110,59 +110,6 @@ public class Model extends Observable {
 
     }
 
-    /* helper goes through all the rows in the columns and does the moves / merges */
-    public boolean column_helper (Board b, int col) {
-        boolean changed_tracker = false;
-        int up_to_row = b.size() - 1;
-        for (int row = (b.size() - 2); row >= 0; row -= 1) {
-            boolean move = false;
-            int destination_row = row;
-            Tile t = b.tile(col, row);
-            if (t == null) {
-                continue; /* go to next tile */
-            } else {
-                /* assign the tile_above to observe */
-                /* if tile above row exceeds the up_to, you're done - nothing left to do with this tile */
-                if (row + 1 > up_to_row) {
-                    break;
-                }
-                Tile tile_above = b.tile(col, row + 1);
-                /* now you've assigned a tile_above -- we check against it for next steps */
-                while (true) {
-                    if (tile_above == null) {
-                        destination_row = destination_row + 1;
-                        move = true;
-                        /* if you've reached the top row OR if you've reached up_to_row */
-                        if (destination_row == b.size() - 1 || destination_row == up_to_row) {
-                            break;
-                        }
-                    } else if (tile_above.value() == t.value()) {
-                        move = true;
-                        destination_row = tile_above.row();
-                        break;
-                    }
-                    else {
-                        break;
-                    }
-                    tile_above = b.tile(col, destination_row + 1);
-                    continue;
-                }
-            }
-            if (move == true) {
-                if (this.board.move(col, destination_row, t) == true) { /* if merge happened */
-                    this.score += tile(col, destination_row).value();
-                    up_to_row = destination_row - 1;
-                    changed_tracker = true;
-                }
-            }
-        }
-        if (changed_tracker = true) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
@@ -170,15 +117,73 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-        if (side == Side.NORTH) {
-            for (int col = 0; col < this.board.size(); col += 1) {
-                if (column_helper(this.board, col) == true) { /* this calls column_helper while also checking its return */
-                    changed = true;
-                    System.out.println(col);
-                    System.out.println(this.board);
+        this.board.setViewingPerspective(side);
+
+        // The main loop through the columns
+        for (int col = 0; col < this.board.size(); col += 1) {
+            int up_to_row = this.board.size() - 1;
+            // The main loop through the rows
+            for (int row = (this.board.size() - 2); row >= 0; row -= 1) {
+                // Reference this variable to know whether the tile or not at the end of this loop run
+                boolean move = false;
+                // Tells you where you need to move to -- since we don't change columns, only rows
+                int destination_row = row;
+                // START here -- determine the tile you are evaluating
+                Tile t = this.board.tile(col, row);
+
+                // If that tile is empty, you don't need to *move* -- STOP and go to the next loop cycle w next tile
+                if (t == null) {
+                    continue;
+                } else { // If tile is not empty -- look at what you need to do
+                    // If tile above this one has already merged -- you can't do anything more with the current tile, so stop the run
+                    // STOP and go to next loop cycle
+                    if (row + 1 > up_to_row) {
+                        continue; // Continue to the next tile
+                    }
+                    // Figure out what the tile above has
+                    Tile tile_above = this.board.tile(col, row + 1);
+
+                    // Check what condition that tile above meets
+                    while (true) {
+                        // If tile above is empty -- if so, mark that you can potentially go there
+                        if (tile_above == null) {
+                            destination_row = destination_row + 1;
+                            // Mark we can move to this spot, if not further
+                            move = true;
+                            changed = true;
+                            // Check if you can check the next tile above -- or are there no more tiles above?
+                            // Check if you have already merged up to the next row above -- also a sign to stop
+                            if (destination_row == this.board.size() - 1 || destination_row == up_to_row) {
+                                break;
+                            }
+                        // If tile above is not empty -- check if you can merge into. If yes, move. If no, you're done.
+                        } else if (tile_above.value() == t.value()) {
+                            move = true;
+                            changed = true;
+                            destination_row = destination_row + 1;
+                            break;
+                        }
+                        // If tile above is not empty and doesn't match -- you move on to the next row;
+                        else {
+                            break;
+                        }
+                        // If you haven't yet met any of the breaking conditions -- evaluate the next tile up
+                        tile_above = this.board.tile(col, destination_row + 1);
+                        continue;
+                    }
+                }
+
+                if (move == true) {
+                    if (this.board.move(col, destination_row, t) != false) {
+                        this.score += tile(col, destination_row).value();
+                        up_to_row = destination_row - 1;
+                    }
                 }
             }
         }
+
+        this.board.setViewingPerspective(Side.NORTH);
+
         checkGameOver();
         if (changed) {
             setChanged();
