@@ -24,13 +24,10 @@ public class TimeAList {
 
     public static void timeAListConstruction() {
         // TODO: YOUR CODE HERE
+        int[] numbers = {1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000};
         AList<Integer> Ns = new AList<Integer>();
         AList<Double> times = new AList<Double>();
         AList<Integer> opCounts = new AList<Integer>();
-
-        //
-        int[] numbers = {1000, 2000, 4000, 8000, 16000, 32000, 64000, 128000};
-
 
         for (int i : numbers){
             AList<Integer> temp = new AList<Integer>();
