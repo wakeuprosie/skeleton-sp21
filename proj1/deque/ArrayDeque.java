@@ -55,15 +55,15 @@ public class ArrayDeque<T> {
     public void downsize() {
         T[] newItems = (T[]) new Object [items.length / 3];
         if (nextLast == 0) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
+            System.arraycopy(items, (nextFirst + 1), newItems, 0, size);
         } else if (nextLast < nextFirst) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 1, (items.length - 1 - nextFirst));
+            System.arraycopy(items, (nextFirst + 1), newItems, 0, (items.length - 1 - nextFirst));
             System.arraycopy(items, 0, newItems, (items.length - nextFirst), nextLast);
         } else {
-            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
+            System.arraycopy(items, (nextFirst + 1), newItems, 0, size);
         }
-        nextFirst = 0;
-        nextLast = size + 1;
+        nextFirst = newItems.length - 1;
+        nextLast = size;
         items = newItems;
     }
 

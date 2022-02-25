@@ -87,11 +87,11 @@ public class ArrayDequeTest {
     @Test
     public void getTest() {
         ArrayDeque A = new ArrayDeque();
-        int N = 20;
-        for (int i = 0; i < N; i += 1) {
+        int N = 9;
+        for (int i = 1; i < N; i += 1) {
             A.addLast(i);
             }
-        assertEquals(A.get(18), 17);
+        assertEquals(A.get(7), 7);
     }
 
     @Test
