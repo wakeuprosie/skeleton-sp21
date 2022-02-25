@@ -87,12 +87,11 @@ public class ArrayDequeTest {
     @Test
     public void getTest() {
         ArrayDeque A = new ArrayDeque();
-        A.addLast(2);
-        A.addLast(3);
-        A.addLast(4);
-        assertEquals(A.get(5), 2);
-        assertEquals(A.get(2), null);
-        assertEquals(A.get(19), null);
+        int N = 20;
+        for (int i = 0; i < N; i += 1) {
+            A.addLast(i);
+            }
+        assertEquals(A.get(18), 17);
     }
 
     @Test
@@ -105,20 +104,28 @@ public class ArrayDequeTest {
             if (operationNumber == 0) {
                 // addFirst
                 int randVal = StdRandom.uniform(0, 100);
+                int S = L.size();
                 L.addFirst(randVal);
+                assertEquals(L.size(), S + 1);
             } else if (operationNumber == 1) {
                 // addLast
                 int randVal = StdRandom.uniform(0, 100);
+                int S = L.size();
                 L.addLast(randVal);
+                assertEquals(L.size(), S + 1);
             } else if (operationNumber == 2) {
                 // removeFirst
                 if (L.size() > 0) {
+                    int S = L.size();
                     L.removeFirst();
+                    assertEquals(L.size(), S - 1);
                 }
             } else if (operationNumber == 3) {
                 // removeLast
                 if (L.size() > 0) {
+                    int S = L.size();
                     L.removeLast();
+                    assertEquals(L.size(), S - 1);
                 }
             }
         }

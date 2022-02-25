@@ -1,24 +1,24 @@
 package deque;
 
 public class ArrayDeque<T> {
-    private T[] items;
+    public T[] items;
     private Integer nextFirst;
     private Integer nextLast;
     private int size;
 
     /** Creates an empty deque */
     public ArrayDeque() {
-        items = (T[]) new Object[100];
-        nextFirst = 4;
-        nextLast = 5;
+        items = (T[]) new Object[8];
+        nextFirst = 0;
+        nextLast = 1;
         size = 0;
     }
 
     /** Creates a deque of one item */
     public ArrayDeque(T item) {
         items = (T[]) new Object[8];
-        nextFirst = 4;
-        nextLast = 5;
+        nextFirst = 0;
+        nextLast = 1;
         items[nextFirst + 1] = item;
         if (nextLast == items.length) {
             nextLast = 0;
@@ -28,31 +28,32 @@ public class ArrayDeque<T> {
         size = 1;
     }
 
+    /* resets first and last if the whole array becomes empty */
+    public void resetFirstAndLast() {
+        if (size == 0) {
+            nextFirst = 0;
+            nextLast = 1;
+        }
+    }
+
     public void resize() {
         T[] newItems = (T[]) new Object [items.length * 2];
-        if (nextLast == 0) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
-        } else if (nextLast < nextFirst || nextLast == nextFirst) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 1, (items.length - 1 - nextFirst));
-            System.arraycopy(items, 0, newItems, (items.length - nextFirst), nextLast);
-        } else {
-            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
-        }
-        nextFirst = 0;
-        nextLast = size + 1;
+        System.arraycopy(items, 0, newItems, 0, size);
+        nextFirst = newItems.length - 1;
+        nextLast = size;
         items = newItems;
     }
 
     /* Check if remove brings memory storage under 25%, if so, call downsize */
     public void capacityCheck() {
-        if (items.length >= 100 && size < items.length *.25) {
+        if (items.length >= 16 && (size < items.length *.25)) {
             downsize();
         }
     }
 
     /* Reduces length of array to half and resets the nextFirst and nextLast */
     public void downsize() {
-        T[] newItems = (T[]) new Object [items.length / 2];
+        T[] newItems = (T[]) new Object [items.length / 3];
         if (nextLast == 0) {
             System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
         } else if (nextLast < nextFirst) {
@@ -67,12 +68,11 @@ public class ArrayDeque<T> {
     }
 
     public void addFirst(T item) {
-        if (nextFirst == nextLast) {
-            resize();
-        }
         items[nextFirst] = item;
         size += 1;
-        if (nextFirst == 0) {
+        if (size == items.length) {
+            resize();
+        } else if (nextFirst == 0) {
             nextFirst = items.length - 1;
         } else {
             nextFirst -= 1;
@@ -80,12 +80,11 @@ public class ArrayDeque<T> {
     }
 
     public void addLast(T item) {
-        if (nextFirst == nextLast) {
-            resize();
-        }
         items[nextLast] = item;
         size += 1;
-        if (nextLast == items.length - 1) {
+        if (size == items.length) {
+            resize();
+        } else if (nextLast == items.length - 1) {
             nextLast = 0;
         } else {
             nextLast += 1;
@@ -125,14 +124,16 @@ public class ArrayDeque<T> {
     }
 
     public T removeFirst() {
+        /* empty list check */
         if (size == 0) {
             return null;
         }
+        /* if no empty list ... */
         T item;
         int index;
         if (nextFirst == items.length - 1) {
            index = 0;
-           nextFirst = 1;
+           nextFirst = 0;
         } else {
             index = nextFirst + 1;
             nextFirst += 1;
@@ -141,6 +142,7 @@ public class ArrayDeque<T> {
         items[index] = null;
         size -= 1;
         capacityCheck();
+        resetFirstAndLast();
         return item;
     }
 
@@ -160,15 +162,14 @@ public class ArrayDeque<T> {
         }
         size -= 1;
         capacityCheck();
+        resetFirstAndLast();
         return item;
     }
 
     public T get(int index) {
         if (index > items.length) {
-            System.out.println("Index out of range.");
             return null;
         } else if (items[index] == null) {
-            System.out.println("Index item null.");
             return null;
         } else {
             return items[index];
