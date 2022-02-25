@@ -4,36 +4,199 @@ public class ArrayDeque<T> {
     public T[] items;
     private Integer nextFirst;
     private Integer nextLast;
+    private Integer first;
+    private Integer last;
     private int size;
 
     /** Creates an empty deque */
     public ArrayDeque() {
         items = (T[]) new Object[8];
         nextFirst = 0;
+        first = null;
         nextLast = 1;
+        last = null;
         size = 0;
     }
 
-    /** Creates a deque of one item */
+    /** Creates deque of one item */
     public ArrayDeque(T item) {
         items = (T[]) new Object[8];
         nextFirst = 0;
         nextLast = 1;
-        items[nextFirst + 1] = item;
-        if (nextLast == items.length) {
+        items[nextFirst] = item;
+        first = nextFirst;
+        last = nextFirst;
+        nextFirst = (items.length - 1);
+        size = 1;
+    }
+
+    /** ADD FIRST */
+    public void addFirst(T item) {
+        /** resize check before add First */
+        if (size == items.length) {
+            resize();
+        }
+        /** add item to first position */
+        items[nextFirst] = item;
+        /** update first */
+        first = nextFirst;
+        /** update last */
+        if (last == null) {
+            last = nextFirst;
+        } else {
+            if (nextLast == 0) {
+                last = (items.length - 1);
+            } else {
+                last = nextLast - 1;
+            }
+        }
+        /** update nextFirst */
+        if (nextFirst == 0) {
+            nextFirst = (items.length - 1);
+        } else {
+            nextFirst -= 1;
+        }
+        size += 1;
+        if (size == items.length) {
+            nextFirst = null;
+            nextLast = null;
+        }
+    }
+
+    /* add last function */
+    public void addLast(T item) {
+        /** resize check before add Last */
+        if (size == items.length) {
+            resize();
+        }
+        /** add item to last position */
+        items[nextLast] = item;
+        /** update Last */
+        last = nextLast;
+        /** update first */
+        if (first == null) {
+            first = last;
+        } else {
+            first = nextFirst + 1;
+        }
+        /** update nextLast */
+        if (nextLast == items.length - 1) {
             nextLast = 0;
         } else {
             nextLast += 1;
         }
-        size = 1;
+        size += 1;
+        if (size == items.length) {
+            nextLast = null;
+            nextFirst = null;
+        }
     }
 
-    /* resets first and last if the whole array becomes empty */
-    public void resetFirstAndLast() {
+    /** REMOVE FUNCTIONS */
+    public T removeFirst() {
+        /* empty list check */
         if (size == 0) {
-            nextFirst = 0;
-            nextLast = 1;
+            return null;
         }
+
+        /* save item to return at end */
+        T item = items[first];
+
+        /* remove the item */
+        items[first] = null;
+
+        /* update size */
+        size -= 1;
+
+        /* update nextFirst */
+        nextFirst = first;
+
+        /* update nextLast */
+        if (nextLast == null) {
+            nextLast = nextFirst;
+        }
+
+        /* update first */
+        if (first == (items.length - 1)){
+            first = 0;
+        } else {
+            first += 1;
+        }
+
+
+//        /* check memory and update */
+//        capacityCheck();
+//        resetFirstAndLast();
+        return item;
+    }
+
+    public T removeLast() {
+        /* empty list check */
+        if (size == 0) {
+            return null;
+        }
+
+        /* save item to return at end */
+        T item = items[last];
+
+        /* remove the item */
+        items[last] = null;
+
+        /* update size */
+        size -= 1;
+
+        /* update nextLast */
+        nextLast = last;
+
+        /* update nextLast */
+        if (nextFirst == null) {
+            nextFirst = nextLast;
+        }
+
+        /* update first */
+        if (last == 0){
+            last = (items.length - 1);
+        } else {
+            last -= 1;
+        }
+
+        return item;
+    }
+
+    /** GET */
+    public T get(int n) {
+        if (size() == 0) {
+            return null;
+        } else {
+            int index;
+            if (first == 0) {
+                index = n;
+            } else {
+                index = ((first + n) % items.length);
+            }
+            return items[index];
+        }
+    }
+
+    /** PRINT */
+    public void printDeque() {
+        int p;
+        if (nextFirst == 0) {
+            p = 0;
+        } else {
+            p = nextFirst + 1;
+        }
+        int s = size;
+        while (s != 0) {
+            System.out.print(items[p] + " ");
+            if (p == items.length - 1) {
+                p = 0;
+            } else {
+                p += 1;
+            }
+            s -= 1;
+        }
+        System.out.println();
     }
 
     public void resize() {
@@ -42,6 +205,15 @@ public class ArrayDeque<T> {
         nextFirst = newItems.length - 1;
         nextLast = size;
         items = newItems;
+    }
+
+    /** HELPERS */
+    /* resets first and last if the whole array becomes empty */
+    public void resetFirstAndLast() {
+        if (size == 0) {
+            nextFirst = 0;
+            nextLast = 1;
+        }
     }
 
     /* Check if remove brings memory storage under 25%, if so, call downsize */
@@ -67,30 +239,7 @@ public class ArrayDeque<T> {
         items = newItems;
     }
 
-    public void addFirst(T item) {
-        items[nextFirst] = item;
-        size += 1;
-        if (size == items.length) {
-            resize();
-        } else if (nextFirst == 0) {
-            nextFirst = items.length - 1;
-        } else {
-            nextFirst -= 1;
-        }
-    }
-
-    public void addLast(T item) {
-        items[nextLast] = item;
-        size += 1;
-        if (size == items.length) {
-            resize();
-        } else if (nextLast == items.length - 1) {
-            nextLast = 0;
-        } else {
-            nextLast += 1;
-        }
-    }
-
+    /** EMPTY AND SIZE */
     public boolean isEmpty() {
         if (size == 0) {
             return true;
@@ -99,81 +248,9 @@ public class ArrayDeque<T> {
         }
     }
 
+    /* size check */
     public int size() {
         return size;
-    }
-
-    public void printDeque() {
-        int p;
-        if (nextFirst == 0) {
-            p = 0;
-        } else {
-            p = nextFirst + 1;
-        }
-        int s = size;
-        while (s != 0) {
-            System.out.print(items[p] + " ");
-            if (p == items.length - 1) {
-                p = 0;
-            } else {
-                p += 1;
-            }
-            s -= 1;
-        }
-        System.out.println();
-    }
-
-    public T removeFirst() {
-        /* empty list check */
-        if (size == 0) {
-            return null;
-        }
-        /* if no empty list ... */
-        T item;
-        int index;
-        if (nextFirst == items.length - 1) {
-           index = 0;
-           nextFirst = 0;
-        } else {
-            index = nextFirst + 1;
-            nextFirst += 1;
-        }
-        item = items[index];
-        items[index] = null;
-        size -= 1;
-        capacityCheck();
-        resetFirstAndLast();
-        return item;
-    }
-
-    public T removeLast() {
-        if (size == 0) {
-            return null;
-        }
-        T item;
-        if (nextLast == 0) {
-            item = items[items.length - 1];
-            items[items.length - 1] = null;
-            nextLast = items.length - 1;
-        } else {
-            item = items[nextLast - 1];
-            items[nextLast - 1] = null;
-            nextLast -= 1;
-        }
-        size -= 1;
-        capacityCheck();
-        resetFirstAndLast();
-        return item;
-    }
-
-    public T get(int index) {
-        if (index > items.length) {
-            return null;
-        } else if (items[index] == null) {
-            return null;
-        } else {
-            return items[index];
-        }
     }
 
     public static void main(String[] args) {
