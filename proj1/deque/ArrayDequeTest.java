@@ -1,5 +1,6 @@
 package deque;
 
+import edu.princeton.cs.algs4.StdRandom;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -93,6 +94,36 @@ public class ArrayDequeTest {
         assertEquals(A.get(2), null);
         assertEquals(A.get(19), null);
     }
+
+    @Test
+    public void randomizedTest() {
+        ArrayDeque<Integer> L = new ArrayDeque<Integer>();
+
+        int N = 5000;
+        for (int i = 0; i < N; i += 1) {
+            int operationNumber = StdRandom.uniform(0, 4);
+            if (operationNumber == 0) {
+                // addFirst
+                int randVal = StdRandom.uniform(0, 100);
+                L.addFirst(randVal);
+            } else if (operationNumber == 1) {
+                // addLast
+                int randVal = StdRandom.uniform(0, 100);
+                L.addLast(randVal);
+            } else if (operationNumber == 2) {
+                // removeFirst
+                if (L.size() > 0) {
+                    L.removeFirst();
+                }
+            } else if (operationNumber == 3) {
+                // removeLast
+                if (L.size() > 0) {
+                    L.removeLast();
+                }
+            }
+        }
+    }
+
 
     @Test
     public void downsizeTest() {

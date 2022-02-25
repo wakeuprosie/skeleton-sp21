@@ -30,9 +30,16 @@ public class ArrayDeque<T> {
 
     public void resize() {
         T[] newItems = (T[]) new Object [items.length * 2];
-        System.arraycopy(items, 0, newItems, 0, nextFirst);
-        System.arraycopy(items, (nextLast + 1), newItems, (items.length + nextFirst + 1), (items.length - nextFirst - 1));
-        nextFirst = items.length + nextFirst;
+        if (nextLast == 0) {
+            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
+        } else if (nextLast < nextFirst || nextLast == nextFirst) {
+            System.arraycopy(items, (nextFirst + 1), newItems, 1, (items.length - 1 - nextFirst));
+            System.arraycopy(items, 0, newItems, (items.length - nextFirst), nextLast);
+        } else {
+            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
+        }
+        nextFirst = 0;
+        nextLast = size + 1;
         items = newItems;
     }
 
@@ -46,26 +53,17 @@ public class ArrayDeque<T> {
     /* Reduces length of array to half and resets the nextFirst and nextLast */
     public void downsize() {
         T[] newItems = (T[]) new Object [items.length / 2];
-        if (nextLast < nextFirst) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 0, (items.length - (nextFirst + 1)));
-            System.arraycopy(items, 0, newItems, (items.length - nextFirst - 1), (nextLast - 1));
+        if (nextLast == 0) {
+            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
+        } else if (nextLast < nextFirst) {
+            System.arraycopy(items, (nextFirst + 1), newItems, 1, (items.length - 1 - nextFirst));
+            System.arraycopy(items, 0, newItems, (items.length - nextFirst), nextLast);
         } else {
-            System.arraycopy(items, (nextFirst + 1), newItems, 0, size);
+            System.arraycopy(items, (nextFirst + 1), newItems, 1, size);
         }
         nextFirst = 0;
-        nextLast = 1;
+        nextLast = size + 1;
         items = newItems;
-    }
-
-    /* Checks if incrementing nextFirst or nextLast will error */
-    public boolean checkIndexLoop() {
-        if (nextFirst == 0) {
-            return true;
-        } else if (nextLast == items.length - 1) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     public void addFirst(T item) {
@@ -74,7 +72,7 @@ public class ArrayDeque<T> {
         }
         items[nextFirst] = item;
         size += 1;
-        if (checkIndexLoop()) {
+        if (nextFirst == 0) {
             nextFirst = items.length - 1;
         } else {
             nextFirst -= 1;
@@ -87,7 +85,7 @@ public class ArrayDeque<T> {
         }
         items[nextLast] = item;
         size += 1;
-        if (checkIndexLoop()) {
+        if (nextLast == items.length - 1) {
             nextLast = 0;
         } else {
             nextLast += 1;
@@ -108,7 +106,7 @@ public class ArrayDeque<T> {
 
     public void printDeque() {
         int p;
-        if (checkIndexLoop()) {
+        if (nextFirst == 0) {
             p = 0;
         } else {
             p = nextFirst + 1;
@@ -130,13 +128,17 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
-        T item = items[nextFirst + 1];
-        items[nextFirst + 1] = null;
-        if (nextFirst + 1 > items.length) {
-            nextFirst = 0;
+        T item;
+        int index;
+        if (nextFirst == items.length - 1) {
+           index = 0;
+           nextFirst = 1;
         } else {
-            nextFirst = nextFirst + 1;
+            index = nextFirst + 1;
+            nextFirst += 1;
         }
+        item = items[index];
+        items[index] = null;
         size -= 1;
         capacityCheck();
         return item;
@@ -148,9 +150,9 @@ public class ArrayDeque<T> {
         }
         T item;
         if (nextLast == 0) {
-            item = items[items.length];
-            items[items.length] = null;
-            nextLast = items.length;
+            item = items[items.length - 1];
+            items[items.length - 1] = null;
+            nextLast = items.length - 1;
         } else {
             item = items[nextLast - 1];
             items[nextLast - 1] = null;
