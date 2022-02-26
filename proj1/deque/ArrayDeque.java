@@ -1,12 +1,16 @@
 package deque;
 
+import edu.princeton.cs.algs4.StdRandom;
+
+import static org.junit.Assert.assertTrue;
+
 public class ArrayDeque<T> {
     public T[] items;
-    private Integer nextFirst;
-    private Integer nextLast;
-    private Integer first;
-    private Integer last;
-    private int size;
+    public Integer nextFirst;
+    public Integer nextLast;
+    public Integer first;
+    public Integer last;
+    public int size;
 
     /** Creates an empty deque */
     public ArrayDeque() {
@@ -38,8 +42,10 @@ public class ArrayDeque<T> {
         }
         /** add item to first position */
         items[nextFirst] = item;
+
         /** update first */
         first = nextFirst;
+
         /** update last */
         if (last == null) {
             last = nextFirst;
@@ -71,14 +77,15 @@ public class ArrayDeque<T> {
         }
         /** add item to last position */
         items[nextLast] = item;
+
         /** update Last */
         last = nextLast;
+
         /** update first */
         if (first == null) {
             first = last;
-        } else {
-            first = nextFirst + 1;
         }
+
         /** update nextLast */
         if (nextLast == items.length - 1) {
             nextLast = 0;
@@ -99,6 +106,9 @@ public class ArrayDeque<T> {
             return null;
         }
 
+        /* capacity check */
+        capacityCheck();
+
         /* save item to return at end */
         T item = items[first];
 
@@ -108,25 +118,28 @@ public class ArrayDeque<T> {
         /* update size */
         size -= 1;
 
-        /* update nextFirst */
-        nextFirst = first;
-
-        /* update nextLast */
-        if (nextLast == null) {
-            nextLast = nextFirst;
-        }
-
-        /* update first */
-        if (first == (items.length - 1)){
-            first = 0;
+        if (size == 0) {
+            first = null;
+            last = null;
+            nextFirst = 0;
+            nextLast = 1;
         } else {
-            first += 1;
+            /* update nextFirst */
+            nextFirst = first;
+
+            /* update nextLast */
+            if (nextLast == null) {
+                nextLast = nextFirst;
+            }
+
+            /* update first */
+            if (first == (items.length - 1)){
+                first = 0;
+            } else {
+                first += 1;
+            }
         }
 
-
-//        /* check memory and update */
-//        capacityCheck();
-//        resetFirstAndLast();
         return item;
     }
 
@@ -135,6 +148,9 @@ public class ArrayDeque<T> {
         if (size == 0) {
             return null;
         }
+
+        /* capacity check */
+        capacityCheck();
 
         /* save item to return at end */
         T item = items[last];
@@ -145,19 +161,27 @@ public class ArrayDeque<T> {
         /* update size */
         size -= 1;
 
-        /* update nextLast */
-        nextLast = last;
+        if (size == 0) {
+            first = null;
+            last = null;
+            nextFirst = 0;
+            nextLast = 1;
 
-        /* update nextLast */
-        if (nextFirst == null) {
-            nextFirst = nextLast;
-        }
-
-        /* update first */
-        if (last == 0){
-            last = (items.length - 1);
         } else {
-            last -= 1;
+            /* update nextLast */
+            nextLast = last;
+
+            /* update nextLast */
+            if (nextFirst == null) {
+                nextFirst = nextLast;
+            }
+
+            /* update last */
+            if (last == 0){
+                last = (items.length - 1);
+            } else {
+                last -= 1;
+            }
         }
 
         return item;
@@ -180,20 +204,11 @@ public class ArrayDeque<T> {
 
     /** PRINT */
     public void printDeque() {
-        int p;
-        if (nextFirst == 0) {
-            p = 0;
-        } else {
-            p = nextFirst + 1;
-        }
+        int p = first;
         int s = size;
         while (s != 0) {
             System.out.print(items[p] + " ");
-            if (p == items.length - 1) {
-                p = 0;
-            } else {
-                p += 1;
-            }
+            p = (p + 1) % items.length;
             s -= 1;
         }
         System.out.println();
@@ -201,9 +216,17 @@ public class ArrayDeque<T> {
 
     public void resize() {
         T[] newItems = (T[]) new Object [items.length * 2];
-        System.arraycopy(items, 0, newItems, 0, size);
-        nextFirst = newItems.length - 1;
+        if (last < first) {
+            System.arraycopy(items, first, newItems, 0, (items.length - first));
+            System.arraycopy(items, 0, newItems, (items.length - first), (last + 1));
+        } else {
+            System.arraycopy(items, first, newItems, 0, size);
+        }
+        first = 0;
+        last = size - 1;
+        nextFirst = (newItems.length - 1);
         nextLast = size;
+
         items = newItems;
     }
 
@@ -218,7 +241,7 @@ public class ArrayDeque<T> {
 
     /* Check if remove brings memory storage under 25%, if so, call downsize */
     public void capacityCheck() {
-        if (items.length >= 16 && (size < items.length *.25)) {
+        if (items.length >= 16 && ((size - 1) < items.length *.25)) {
             downsize();
         }
     }
@@ -227,13 +250,16 @@ public class ArrayDeque<T> {
     public void downsize() {
         T[] newItems = (T[]) new Object [items.length / 3];
         if (nextLast == 0) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 0, size);
-        } else if (nextLast < nextFirst) {
-            System.arraycopy(items, (nextFirst + 1), newItems, 0, (items.length - 1 - nextFirst));
-            System.arraycopy(items, 0, newItems, (items.length - nextFirst), nextLast);
+            System.arraycopy(items, first, newItems, 0, size);
+        } else if (last < first) {
+            System.arraycopy(items, first, newItems, 0, (items.length - first));
+            System.arraycopy(items, 0, newItems, (items.length - first), (size - (items.length - first)));
         } else {
-            System.arraycopy(items, (nextFirst + 1), newItems, 0, size);
+            System.arraycopy(items, first, newItems, 0, size);
         }
+        /* update tracker variables */
+        first = 0;
+        last = size - 1;
         nextFirst = newItems.length - 1;
         nextLast = size;
         items = newItems;
@@ -248,23 +274,13 @@ public class ArrayDeque<T> {
         }
     }
 
-    /* size check */
     public int size() {
         return size;
     }
 
+    /** MAIN */
     public static void main(String[] args) {
-        ArrayDeque A = new ArrayDeque();
-        A.addLast(2);
-        A.addLast(3);
-        A.addLast(4);
-        A.addLast(5);
-        A.addLast(6);
-        A.addLast(7);
-        A.addLast(8);
-        A.addLast(9);
-        A.addLast(10);
-        A.removeLast();
+        ArrayDeque<Integer> L = new ArrayDeque<Integer>();
 
     }
 

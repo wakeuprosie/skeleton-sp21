@@ -24,6 +24,7 @@ public class ArrayDequeTest {
         A.addFirst(7);
         A.addFirst(8);
         A.addFirst(9);
+        A.addFirst(10);
     }
 
     @Test
@@ -51,7 +52,7 @@ public class ArrayDequeTest {
         A.addLast(7);
         A.addLast(8);
         A.addLast(9);
-        A.addLast(10);
+        A.printDeque();
         A.printDeque();
     }
 
@@ -67,25 +68,6 @@ public class ArrayDequeTest {
         A.addLast(8);
         A.addLast(9);
         assertEquals(A.get(5), 7);
-    }
-
-    @Test
-    public void fillEmptyFillTest() {
-        ArrayDeque A = new ArrayDeque();
-        A.addFirst(2);
-        A.addLast(3);
-        A.addLast(4);
-        A.addLast(5);
-        A.addLast(6);
-        A.addLast(7);
-        A.addLast(8);
-        A.addLast(9);
-        A.addLast(10);
-        for (int i = 0; i < 8; i += 1) {
-            A.removeFirst();
-        }
-        ArrayDeque B = new ArrayDeque();
-        assertArrayEquals(A.items, B.items);
     }
 
     @Test
@@ -133,35 +115,46 @@ public class ArrayDequeTest {
         for (int i = 0; i < N; i += 1) {
             int operationNumber = StdRandom.uniform(0, 4);
             if (operationNumber == 0) {
-                // addFirst
                 int randVal = StdRandom.uniform(0, 100);
-                int S = L.size();
                 L.addFirst(randVal);
-                assertEquals(L.size(), S + 1);
             } else if (operationNumber == 1) {
-                // addLast
                 int randVal = StdRandom.uniform(0, 100);
-                int S = L.size();
                 L.addLast(randVal);
-                assertEquals(L.size(), S + 1);
             } else if (operationNumber == 2) {
-                // removeFirst
                 if (L.size() > 0) {
-                    int S = L.size();
                     L.removeFirst();
-                    assertEquals(L.size(), S - 1);
                 }
             } else if (operationNumber == 3) {
-                // removeLast
                 if (L.size() > 0) {
-                    int S = L.size();
                     L.removeLast();
-                    assertEquals(L.size(), S - 1);
                 }
             }
         }
     }
 
+    @Test
+    public void resizeOnlyTest() {
+        ArrayDeque<Integer> L = new ArrayDeque<Integer>();
+
+        int N = 5000;
+        for (int i = 0; i < N; i += 1) {
+            int operationNumber = StdRandom.uniform(0, 2);
+            if (operationNumber == 0) {
+                // addFirst
+                int randVal = StdRandom.uniform(0, 100);
+                int S = L.size();
+                L.addFirst(randVal);
+                assertEquals(L.size(), S + 1);
+            }
+            if (operationNumber == 1) {
+                // addLast
+                int randVal = StdRandom.uniform(0, 100);
+                int S = L.size();
+                L.addLast(randVal);
+                assertEquals(L.size(), S + 1);
+            }
+        }
+    }
 
     @Test
     public void downsizeTest() {
