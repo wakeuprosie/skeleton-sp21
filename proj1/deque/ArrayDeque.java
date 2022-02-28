@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 public class ArrayDeque<T> {
     public T[] items;
-    private Integer nextFirst;
-    private Integer nextLast;
+    public Integer nextFirst;
+    public Integer nextLast;
     public Integer first;
     public Integer last;
     public int size;

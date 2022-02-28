@@ -2,13 +2,13 @@ package deque;
 
 import java.util.Comparator;
 
-public class MaxArrayDeque extends ArrayDeque {
+public class MaxArrayDeque<T> extends ArrayDeque {
 
-    public Comparator<T> comparatorDefault;
+    private Comparator<T> comparatorDefault;
 
     public MaxArrayDeque(Comparator<T> c) {
         super();
-        comparatorDefault = c;
+        this.comparatorDefault = c;
 
     }
 
@@ -21,9 +21,9 @@ public class MaxArrayDeque extends ArrayDeque {
         if (first == null) {
             return null;
         }
-        T currentmax = this.items[first];
+        T currentmax = (T) items[first];
         for (int i = 0; i < size; i += 1) {
-            T item = get(i);
+            T item = (T) get(i);
             if (comparatorDefault.compare(item, currentmax) > 0) {
                 currentmax = item;
             }
@@ -35,9 +35,9 @@ public class MaxArrayDeque extends ArrayDeque {
         if (first == null) {
             return null;
         }
-        T currentmax = items[first];
+        T currentmax = (T) items[first];
         for (int i = 0; i < size; i += 1) {
-            T item = get(i);
+            T item = (T) get(i);
             if (c.compare(item, currentmax) > 0) {
                 currentmax = item;
             }
