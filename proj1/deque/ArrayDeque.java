@@ -6,8 +6,8 @@ import static org.junit.Assert.assertTrue;
 
 public class ArrayDeque<T> {
     public T[] items;
-    public Integer nextFirst;
-    public Integer nextLast;
+    private Integer nextFirst;
+    private Integer nextLast;
     public Integer first;
     public Integer last;
     public int size;
@@ -192,12 +192,7 @@ public class ArrayDeque<T> {
         if (size() == 0) {
             return null;
         } else {
-            int index;
-            if (first == 0) {
-                index = n;
-            } else {
-                index = ((first + n) % items.length);
-            }
+            int index = ((first + n) % items.length);
             return items[index];
         }
     }
@@ -248,7 +243,7 @@ public class ArrayDeque<T> {
 
     /* Reduces length of array to half and resets the nextFirst and nextLast */
     public void downsize() {
-        T[] newItems = (T[]) new Object [items.length / 3];
+        T[] newItems = (T[]) new Object [items.length / 2];
         if (nextLast == 0) {
             System.arraycopy(items, first, newItems, 0, size);
         } else if (last < first) {
