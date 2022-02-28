@@ -31,7 +31,6 @@ public class ArrayDeque<T> implements Deque<T> {
     }
 
     /** ADD FIRST */
-    @Override
     public void addFirst(T item) {
         /** resize check before add First */
         if (size == items.length) {
