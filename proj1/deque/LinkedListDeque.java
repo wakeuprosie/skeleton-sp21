@@ -1,7 +1,7 @@
 package deque;
 
 /** Double linked list class **/
-public class LinkedListDeque<T> {
+public class LinkedListDeque<T> implements Deque<T>{
     private class TNode {
         public T item;
         public TNode prev;
@@ -37,6 +37,7 @@ public class LinkedListDeque<T> {
     }
 
     /* Adds x to the front of the list */
+    @Override
     public void addFirst(T item) {
         TNode pointer_hold = sentinel.next;
         sentinel.next = new TNode(item, sentinel, pointer_hold);
@@ -45,6 +46,7 @@ public class LinkedListDeque<T> {
     }
 
     /* Adds x to the back of the list */
+    @Override
     public void addLast(T item) {
         TNode news = new TNode(item, last.prev, last);
         last.prev = news;
@@ -52,18 +54,12 @@ public class LinkedListDeque<T> {
         size += 1;
     }
 
-    public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    @Override
     public int size() {
         return size;
     }
 
+    @Override
     public void printDeque() {
         if (sentinel.next != last) {
             TNode p = sentinel.next;
@@ -78,6 +74,7 @@ public class LinkedListDeque<T> {
         System.out.println();
     }
 
+    @Override
     public T removeFirst() {
         if (sentinel.next == last) {
             return null;
@@ -91,6 +88,7 @@ public class LinkedListDeque<T> {
         }
     }
 
+    @Override
     public T removeLast() {
         if (last.prev == sentinel) {
             return null;
@@ -104,6 +102,7 @@ public class LinkedListDeque<T> {
         }
     }
 
+    @Override
     public T get(int index) {
         if (sentinel.next == last) {
             return null;

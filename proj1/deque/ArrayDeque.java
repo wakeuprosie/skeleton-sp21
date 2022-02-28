@@ -1,10 +1,6 @@
 package deque;
 
-import edu.princeton.cs.algs4.StdRandom;
-
-import static org.junit.Assert.assertTrue;
-
-public class ArrayDeque<T> {
+public class ArrayDeque<T> implements Deque<T> {
     public T[] items;
     public Integer nextFirst;
     public Integer nextLast;
@@ -35,6 +31,7 @@ public class ArrayDeque<T> {
     }
 
     /** ADD FIRST */
+    @Override
     public void addFirst(T item) {
         /** resize check before add First */
         if (size == items.length) {
@@ -70,6 +67,7 @@ public class ArrayDeque<T> {
     }
 
     /* add last function */
+    @Override
     public void addLast(T item) {
         /** resize check before add Last */
         if (size == items.length) {
@@ -100,6 +98,7 @@ public class ArrayDeque<T> {
     }
 
     /** REMOVE FUNCTIONS */
+    @Override
     public T removeFirst() {
         /* empty list check */
         if (size == 0) {
@@ -143,6 +142,7 @@ public class ArrayDeque<T> {
         return item;
     }
 
+    @Override
     public T removeLast() {
         /* empty list check */
         if (size == 0) {
@@ -188,6 +188,7 @@ public class ArrayDeque<T> {
     }
 
     /** GET */
+    @Override
     public T get(int n) {
         if (size() == 0) {
             return null;
@@ -198,6 +199,7 @@ public class ArrayDeque<T> {
     }
 
     /** PRINT */
+    @Override
     public void printDeque() {
         int p = first;
         int s = size;
@@ -260,15 +262,9 @@ public class ArrayDeque<T> {
         items = newItems;
     }
 
-    /** EMPTY AND SIZE */
-    public boolean isEmpty() {
-        if (size == 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+    /** SIZE */
 
+    @Override
     public int size() {
         return size;
     }
