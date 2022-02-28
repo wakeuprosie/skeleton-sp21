@@ -25,6 +25,17 @@ public class MaxArrayDequeTest {
         return new IntComparator();
     }
 
+    /** String comparator class */
+    private static class StringComparator implements Comparator<String> {
+        public int compare(String a, String b) {
+            return a.compareTo(b);
+        }
+    }
+
+    public static Comparator<String> getStringComparator() {
+        return new StringComparator();
+    }
+
     @Test
     public void Test1(){
         Comparator ci = new MaxArrayDequeTest.IntComparator();
@@ -39,6 +50,23 @@ public class MaxArrayDequeTest {
         A.addLast(6);
         A.addLast(7);
         assertEquals(A.max(), 7);
+    }
+
+    @Test
+    public void Test2(){
+        Comparator ci = new MaxArrayDequeTest.IntComparator();
+        Comparator cs = new MaxArrayDequeTest.StringComparator();
+
+        /** Create an MAD with an Int Comparator, but call max with the string comparator */
+        MaxArrayDeque A = new MaxArrayDeque(ci);
+        A.addFirst("Anna");
+        A.addLast("Bobby");
+        A.addLast("Cindy");
+        A.addLast("Dina");
+        A.addLast("Eagore");
+        A.addLast("Francis");
+        A.addLast("Lola");
+        assertEquals(A.max(cs), "Lola");
     }
 
 
