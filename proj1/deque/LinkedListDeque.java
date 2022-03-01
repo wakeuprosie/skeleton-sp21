@@ -109,7 +109,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
     }
 
-    public T getHelper(TNode p, int index) {
+    private T getHelper(TNode p, int index) {
         if (index == 0) {
             return p.item;
         } else {
@@ -170,11 +170,10 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
             return false;
         }
         for (int i = 0; i < size(); i += 1) {
-            if (this.get(i) != object.get(i)) {
+            if (!(this.get(i).equals(object.get(i)))) {
                 return false;
             }
         }
         return true;
     }
-
 }

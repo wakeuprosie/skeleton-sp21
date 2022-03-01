@@ -271,7 +271,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     /* Returns an iterator */
-    public Iterator<T> iterator(){
+    public Iterator<T> iterator() {
         return new ArrayDequeIterator();
     }
 
@@ -279,7 +279,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         if (o == null || (!(o instanceof Deque))) {
             return false;
         }
-       Deque object = (Deque) o;
+
+        Deque object = (Deque) o;
 
         if (this == o) {
             return true;
@@ -289,7 +290,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         }
 
         for (int i = 0; i < size(); i += 1) {
-            if (this.get(i) != object.get(i)) {
+            if (!(this.get(i).equals(object.get(i)))) {
                 return false;
             }
         }
