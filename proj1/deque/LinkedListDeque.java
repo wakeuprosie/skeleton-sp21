@@ -126,9 +126,7 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
 
         if (index == 0)  {
             return currentNode.item;
-        } else {
-           return getHelper(currentNode.next, index - 1);
-        }
+        } else return getHelper(currentNode.next, index - 1);
     }
 
     /** ITERATOR */
