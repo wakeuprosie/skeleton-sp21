@@ -1,11 +1,25 @@
 package deque;
 
+import net.sf.saxon.expr.Component;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
 
 /** Performs some basic linked list tests. */
 public class LinkedListDequeTest {
+
+    @Test
+    public void equalsTest() {
+        LinkedListDeque L = new LinkedListDeque();
+        ArrayDeque A = new ArrayDeque();
+        L.addFirst(5);
+        L.addLast(6);
+        L.addLast(7);
+        A.addFirst(5);
+        A.addLast(6);
+        A.addLast(7);
+        assertEquals(A, L);
+    }
 
     /** Add a few things to the list, check if get returns the correct indexed element */
     @Test
@@ -27,6 +41,16 @@ public class LinkedListDequeTest {
         L.addLast(7);
         assertEquals(L.get(1), 6);
         assertEquals(L.get(2), 7);
+    }
+
+    @Test
+    public void getRecursiveTest(){
+        LinkedListDeque L = new LinkedListDeque();
+        L.addFirst(5);
+        L.addLast(6);
+        L.addLast(7);
+        assertEquals(6, L.getRecursive(1));
+        assertEquals(7, L.getRecursive(2));
     }
 
 
@@ -173,4 +197,5 @@ public class LinkedListDequeTest {
         }
 
     }
+
 }

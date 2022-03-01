@@ -33,7 +33,7 @@ public class GuitarString {
         for (int i = 0; i < buffer.size(); i += 1) {
             /** generate random number */
             buffer.removeLast();
-            buffer.addLast(Math.random() - 0.5);
+            buffer.addFirst(Math.random() - 0.5);
         }
     }
 
@@ -54,4 +54,5 @@ public class GuitarString {
     public double sample() {
         return (double) buffer.get(0);
     }
+
 }

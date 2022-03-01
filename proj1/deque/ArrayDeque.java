@@ -2,7 +2,7 @@ package deque;
 
 import java.util.Iterator;
 
-public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
+public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
     private T[] items;
     private Integer nextFirst;
     private Integer nextLast;
@@ -18,18 +18,6 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
         nextLast = 1;
         last = null;
         size = 0;
-    }
-
-    /** Creates deque of one item */
-    public ArrayDeque(T item) {
-        items = (T[]) new Object[8];
-        nextFirst = 0;
-        nextLast = 1;
-        items[nextFirst] = item;
-        first = nextFirst;
-        last = nextFirst;
-        nextFirst = (items.length - 1);
-        size = 1;
     }
 
     /* ADD FIRST */
@@ -267,7 +255,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     private class ArrayDequeIterator implements Iterator<T> {
         private int wizPos;
 
-        public ArrayDequeIterator() {
+        ArrayDequeIterator() {
             wizPos = 0;
         }
 
@@ -288,18 +276,18 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
     }
 
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || (!(o instanceof Deque))) {
             return false;
         }
-        ArrayDeque object = (ArrayDeque) o;
+       Deque object = (Deque) o;
 
         if (this == o) {
             return true;
         }
         if (this.size() != object.size()) {
             return false;
-
         }
+
         for (int i = 0; i < size(); i += 1) {
             if (this.get(i) != object.get(i)) {
                 return false;

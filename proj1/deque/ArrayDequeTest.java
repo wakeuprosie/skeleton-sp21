@@ -7,10 +7,6 @@ import static org.junit.Assert.*;
 /** Performs tests on each method of class Array Deque */
 public class ArrayDequeTest {
 
-    @Test
-    public void Test1(){
-        ArrayDeque B = new ArrayDeque(1);
-    }
 
     /* Check if addFirst works */
     @Test
@@ -30,7 +26,6 @@ public class ArrayDequeTest {
     @Test
     public void addLastTest() {
         ArrayDeque A = new ArrayDeque();
-        ArrayDeque B = new ArrayDeque(1);
         A.addLast(2);
         A.addLast(3);
         A.addLast(4);

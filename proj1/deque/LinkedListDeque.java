@@ -29,15 +29,6 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size = 0;
     }
 
-    /* Creates a one element Linked List Deque */
-    public LinkedListDeque(T x) {
-        sentinel = new TNode(x, null, null);
-        last = new TNode(x, null, null);
-        sentinel.next = new TNode(x, sentinel, last);
-        last.prev = sentinel.next;
-        size = 1;
-    }
-
     /* Adds x to the front of the list */
     @Override
     public void addFirst(T item) {
@@ -118,25 +109,34 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         }
     }
 
-    public T getRecursive(int index) {
-        if (sentinel.next == last) {
-            return null;
-        }
-        TNode p = sentinel.next;
+    public T getHelper(TNode p, int index) {
         if (index == 0) {
             return p.item;
         } else {
-            p = p.next;
-            return getRecursive(index - 1);
+            return getHelper(p.next, index - 1);
+        }
+    }
+
+    public T getRecursive(int index) {
+        /* empty LL */
+        if (sentinel.next == last) {
+            return null;
+        }
+        TNode currentNode = sentinel.next;
+
+        if (index == 0)  {
+            return currentNode.item;
+        } else {
+           return getHelper(currentNode.next, index - 1);
         }
     }
 
     /** ITERATOR */
     /* New class of iterator */
-    private class linkedListIterator implements Iterator<T> {
+    private class LinkedListIterator implements Iterator<T> {
         private int wizPos;
 
-        public linkedListIterator() {
+        LinkedListIterator() {
             wizPos = 0;
         }
 
@@ -152,16 +152,16 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
     /* Returns an iterator */
-    public Iterator<T> iterator(){
-        return new linkedListIterator();
+    public Iterator<T> iterator() {
+        return new LinkedListIterator();
     }
 
     /* Equals */
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || (!(o instanceof Deque))) {
             return false;
         }
-        LinkedListDeque object = (LinkedListDeque) o;
+        Deque object = (Deque) o;
 
         if (this == o) {
             return true;
