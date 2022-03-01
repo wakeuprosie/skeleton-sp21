@@ -1,13 +1,15 @@
 package deque;
 
-/** Double linked list class **/
-public class LinkedListDeque<T> implements Deque<T>{
-    private class TNode {
-        public T item;
-        public TNode prev;
-        public TNode next;
+import java.util.Iterator;
 
-        public TNode(T i, TNode p, TNode n) {
+/** Double linked list class **/
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
+    private class TNode {
+        private T item;
+        private TNode prev;
+        private TNode next;
+
+        TNode(T i, TNode p, TNode n) {
             item = i;
             prev = p;
             next = n;
@@ -39,9 +41,9 @@ public class LinkedListDeque<T> implements Deque<T>{
     /* Adds x to the front of the list */
     @Override
     public void addFirst(T item) {
-        TNode pointer_hold = sentinel.next;
-        sentinel.next = new TNode(item, sentinel, pointer_hold);
-        pointer_hold.prev = sentinel.next;
+        TNode pointerHold = sentinel.next;
+        sentinel.next = new TNode(item, sentinel, pointerHold);
+        pointerHold.prev = sentinel.next;
         size += 1;
     }
 
@@ -129,14 +131,50 @@ public class LinkedListDeque<T> implements Deque<T>{
         }
     }
 
-    /* Creates a linked list deque of one integer, 10 */
-    public static void main(String[] args) {
-        LinkedListDeque L = new LinkedListDeque();
-        L.addLast(3);
-        L.addLast(4);
-        L.addLast(5);
-        L.removeLast();
-        L.printDeque();
+    /** ITERATOR */
+    /* New class of iterator */
+    private class linkedListIterator implements Iterator<T> {
+        private int wizPos;
+
+        public linkedListIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        public T next() {
+            T returnItem = get(wizPos);
+            wizPos += 1;
+            return returnItem;
+        }
+    }
+
+    /* Returns an iterator */
+    public Iterator<T> iterator(){
+        return new linkedListIterator();
+    }
+
+    /* Equals */
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        LinkedListDeque object = (LinkedListDeque) o;
+
+        if (this == o) {
+            return true;
+        }
+        if (this.size() != object.size()) {
+            return false;
+        }
+        for (int i = 0; i < size(); i += 1) {
+            if (this.get(i) != object.get(i)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

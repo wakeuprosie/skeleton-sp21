@@ -71,43 +71,6 @@ public class ArrayDequeTest {
     }
 
     @Test
-    public void removeLastTest() {
-        ArrayDeque A = new ArrayDeque();
-        ArrayDeque B = new ArrayDeque();
-        B.addFirst(2);
-        B.addLast(3);
-        B.addLast(4);
-        B.addLast(5);
-        B.addLast(6);
-        B.addLast(7);
-        B.addLast(8);
-        B.addLast(9);
-        A.addFirst(2);
-        A.addLast(3);
-        A.addLast(4);
-        A.addLast(5);
-        A.addLast(6);
-        A.addLast(7);
-        A.addLast(8);
-        A.addLast(9);
-        A.addLast(10);
-        A.removeLast();
-        assertArrayEquals(A.items, B.items);
-        assertEquals(A.get(0), B.get(0));
-        assertEquals(A.get(4), B.get(4));
-    }
-
-    @Test
-    public void getTest() {
-        ArrayDeque A = new ArrayDeque();
-        int N = 9;
-        for (int i = 1; i < N; i += 1) {
-            A.addLast(i);
-            }
-        assertEquals(A.get(7), 7);
-    }
-
-    @Test
     public void randomizedTest() {
         ArrayDeque<Integer> L = new ArrayDeque<Integer>();
 
