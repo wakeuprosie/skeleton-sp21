@@ -117,7 +117,7 @@ class Utils {
      *  in case of problems. */
     static void writeContents(File file, Object... contents) {
         try {
-            if (file.isDirectory()) {
+            if (file.isDirectory()) {x
                 throw
                     new IllegalArgumentException("cannot overwrite directory");
             }
@@ -219,7 +219,6 @@ class Utils {
             throw error("Internal error serializing commit.");
         }
     }
-
 
 
     /* MESSAGES AND ERROR REPORTING */

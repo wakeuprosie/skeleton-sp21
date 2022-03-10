@@ -1,15 +1,16 @@
 # Gitlet Design Document
 
-**Name**:
+**Name**: Risa Park
 
 ## Classes and Data Structures
 
-### Class 1
+### Commit
 
-#### Fields
+#### Instance Variables / Fields
 
-1. Field 1
-2. Field 2
+1. Message - message of commit
+2. Timestamp - time at which commit was created. Assigned by constructor.
+3. Parent - parent commit of a commit object
 
 
 ### Class 2
