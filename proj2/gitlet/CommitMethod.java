@@ -17,12 +17,12 @@ public class CommitMethod {
     public static void commitMethod(String message) {
 
         File parent = Utils.join(CWD, ".gitlet", "branches", "head");  // Access the commit at HEAD -- the most recent commit in active branch
-        Commit parentCommit = readObject(parent, Commit.class); // Deserialize parent commit into an accesible object
+        Commit parentCommit = readObject(parent, Commit.class); // Deserialize parent commit into an accessible object
 
-        String parentID = sha1(parentCommit);
+        String parentID = sha1(serialize(parentCommit));
         Commit commitObject = new Commit(message, parentID); // Initiate new commit, using the parentID
 
-        String thisCommitID = sha1(commitObject); // Generate a SHA for this commit object
+        String thisCommitID = sha1(serialize(commitObject)); // Generate a SHA for this commit object
 
         // Save staging hashmap to this commits hashmap -- remember we are just saving the IDs of the blobs that are the versions of the files we want "saved" with this commit
         File file = Utils.join(CWD, ".gitlet", "staging-hashmap");

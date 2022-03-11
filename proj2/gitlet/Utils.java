@@ -31,6 +31,7 @@ class Utils {
     /** The length of a complete SHA-1 UID as a hexadecimal numeral. */
     static final int UID_LENGTH = 40;
 
+
     /* SHA-1 HASH VALUES. */
 
     /** Returns the SHA-1 hash of the concatenation of VALS, which may
@@ -63,6 +64,7 @@ class Utils {
         return sha1(vals.toArray(new Object[vals.size()]));
     }
 
+
     /* FILE DELETION */
 
     /** Deletes FILE if it exists and is not a directory.  Returns true
@@ -87,6 +89,7 @@ class Utils {
     static boolean restrictedDelete(String file) {
         return restrictedDelete(new File(file));
     }
+
 
     /* READING AND WRITING FILE CONTENTS */
 
@@ -157,6 +160,7 @@ class Utils {
         writeContents(file, serialize(obj));
     }
 
+
     /* DIRECTORIES */
 
     /** Filter out all but plain files. */
@@ -187,6 +191,7 @@ class Utils {
     static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
     }
+
 
     /* OTHER FILE UTILITIES */
 

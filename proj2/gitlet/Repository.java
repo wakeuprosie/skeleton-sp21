@@ -44,8 +44,8 @@ public class Repository {
         Commit motherCommitObject = new Commit("initial commit", null);
         String motherSHA = Utils.sha1(serialize(motherCommitObject));
         File file = Utils.join(CWD, ".gitlet", "commits", motherSHA);
-        File file2 = Utils.join(CWD, ".gitlet","head");
-        File file3 = Utils.join(CWD, ".gitlet","master");
+        File file2 = Utils.join(CWD, ".gitlet", "branches", "head");
+        File file3 = Utils.join(CWD, ".gitlet","branches", "master");
         writeObject(file, motherCommitObject);
         writeObject(file2, motherCommitObject);
         writeObject(file3, motherCommitObject);

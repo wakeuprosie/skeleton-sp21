@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
@@ -11,7 +12,7 @@ import static gitlet.Utils.*;
 
 public class Staging {
 
-    public static void add(String arg) {
+    public static void add(String arg) throws IOException {
 
         File currentFile = Utils.join(CWD, arg); // Reference to the file of interest on computer
 
@@ -22,14 +23,10 @@ public class Staging {
         }
 
         // Body
-        String fileID = sha1(currentFile); // Get the SHA, aka ID of the current state, of the file of interest
-        File newBlobFolder = Utils.join(CWD, ".gitlet", "blobs", arg); // Reference to blob folder of this file
+        String fileID = sha1(serialize(currentFile)); // Get the SHA, aka ID of the current state, of the file of interest
 
-        if (!newBlobFolder.exists()) { // If a folder for this file does NOT already exist, create it
-            newBlobFolder.mkdir();
-        }
-
-        File newBlobFile = Utils.join(CWD, ".gitlet", "blobs", arg, fileID); // Store the file
+        File newBlobFile = Utils.join(CWD, ".gitlet", "blobs", fileID); // Store the file
+        newBlobFile.createNewFile();
         writeObject(newBlobFile, currentFile); // Serialize and save the file in the blob folder
 
         File file = Utils.join(CWD, ".gitlet", "staging-hashmap");

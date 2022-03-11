@@ -20,7 +20,7 @@ public class Commit implements Serializable {
     public Commit (String message, String parentCommit) {
         // Commit object
         this.message = message;
-        if (this.parent == null) {
+        if (parentCommit == null) {
             this.time = Instant.EPOCH;
         } else {
             this.time = Instant.now();
