@@ -1,9 +1,11 @@
 package gitlet;
 
+import java.io.File;
 import java.io.Serializable;
 import java.time.*;
 import java.util.HashMap;
 
+import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
 
 
@@ -14,7 +16,8 @@ public class Commit implements Serializable {
     private String message;
     private Instant time;
     private String parent;
-    public HashMap trackedFiles;
+    public HashMap trackedFiles; // Files updated in this commit
+    public HashMap superFiles; // A map of ALL files and their latest versions
 
     /** Constructor */
     public Commit (String message, String parentCommit) {
@@ -22,21 +25,23 @@ public class Commit implements Serializable {
         this.message = message;
         if (parentCommit == null) {
             this.time = Instant.EPOCH;
+            this.superFiles = new HashMap();
         } else {
             this.time = Instant.now();
-        }
-        if (parentCommit != null) {
             this.parent = sha1(parentCommit);
+
+            // Access parents superFiles hashmap
+            File parentCommitFile = join(CWD, ".gitlet", "commits", parentCommit);
+            Commit parentCommitobject = readObject(parentCommitFile, Commit.class);
+            HashMap parentSuperFiles = parentCommitobject.superFiles;
+
+            // Copy parent superFiles to this commit
+            this.superFiles.putAll(parentSuperFiles);
         }
         this.trackedFiles = new HashMap();
     }
 
-    /** Method to update tracked files hashmap */
-    public void updateTrackedFiles(HashMap object) {
-        this.trackedFiles = object;
-    }
-
-    public gitlet.Commit getParent() {
+    public String getParent() {
         return this.parent;
     }
 

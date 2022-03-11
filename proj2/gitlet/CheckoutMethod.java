@@ -42,24 +42,78 @@ public class CheckoutMethod {
 
     }
 
-//    public static Commit findTheRightParent(Commit commit, String filename) {
-//        HashMap trackedFiles = commit.trackedFiles;
-//        Commit rightCommit = commit;
-//
-//        if (trackedFiles.containsKey(filename)) {
-//            return rightCommit;
-//        } else {
-//            findTheRightParent(commit.getParent());
-//        }
-//    }
-
     /* Input: [commit id],[file name] */
-    public static void method2() {
+    public static void method2(String commitID, String fileName) {
+
+        File file = join(CWD, fileName);
+
+        // Assert the file exists in the CWD
+        if (!file.exists()) {
+            System.out.print("No commit with that id exists.");
+        }
+
+        // Assert the commit exists in .gitlet/commits
+        File commitFile = join(CWD, ".gitlet", "commits", commitID);
+        if (!commitFile.exists()) {
+            System.out.print("No commit with that id exists.");
+        }
+        Commit commitOpened = readObject(commitFile, Commit.class); // Confirmed commit exists. Open it for access.
+
+        // Get the file in the commit
+        HashMap trackedFiles = commitOpened.trackedFiles;
+        String blobID = (String) trackedFiles.get(fileName);
+        File blob = join(CWD, ".gitlet", "blobs", blobID);
+
+        // Write over the file in the CWD
+        writeContents(file, blob);
 
     }
 
     /* Input: [branch name] */
-    public static void method3() {
+    public static void method3(String branchName) {
+
+        // Open the newest commit at given branch for access
+        File branchNameCommit = Utils.join(CWD, ".gitlet", "branches", "branchName");
+        Commit branchNameCommitOpened = Utils.readObject(branchNameCommit, gitlet.Commit.class);
+
+        // Access the superFiles hashmap
+        HashMap superFiles = branchNameCommitOpened.superFiles;
+
+        // A set of all the filenames that existed up to this commit
+        Set<String> allSuperFileNames = superFiles.keySet();
+
+        // Iterator for this set
+        Iterator<String> itr = allSuperFileNames.iterator();
+
+        // For every file created up to this commit, overwrite the file in CWD with the version in the set
+        while (itr.hasNext()) {
+            String key = itr.next();
+            String shavalue = (String) superFiles.get(key);
+            File fileToOverwrite = join(CWD, key);
+            File blob = join(BLOBS_DIR, shavalue);
+            writeContents(blob, fileToOverwrite);
+        }
+
+        // Delete every file currently in CWD but not in set
+        File fileCWD = CWD;
+        String[] allFilesInCWD = fileCWD.list();
+
+        for (String str : allFilesInCWD) {
+            if (superFiles.get(str) == null) {
+                // delete file on CWD
+                File fileToClear = join(CWD, str);
+                restrictedDelete(fileToClear);
+            }
+        }
+
+        // Clear staging
+        File file = STAGING;
+        HashMap stagingHashMap = readObject(file, HashMap.class);
+        stagingHashMap.clear();
+
+        // Reassign HEAD to the branchname commit
+        File headFile = HEAD_DIR;
+        writeObject(headFile, serialize(branchNameCommitOpened));
 
     }
 

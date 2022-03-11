@@ -34,6 +34,7 @@ public class Repository {
             HEAD_DIR.createNewFile();
             setUpMotherCommit();
             setUpStaging();
+            setUpSuperHashmap();
         } else {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
         }
@@ -57,6 +58,13 @@ public class Repository {
         HashMap staging = new HashMap();
         File file = Utils.join(CWD, ".gitlet", "staging-hashmap"); // Create a pathname to save the staging hashmap
         writeObject(file, staging); // Read blank hashmap into that pathname
+    }
+
+    /** Initiate super hashmap */
+    public static void setUpSuperHashmap() {
+        HashMap superHashMap = new HashMap();
+        File file = Utils.join(CWD, ".gitlet", "super-hashmap"); // Create a pathname to save the staging hashmap
+        writeObject(file, superHashMap); // Read blank hashmap into that pathname
     }
 
 }

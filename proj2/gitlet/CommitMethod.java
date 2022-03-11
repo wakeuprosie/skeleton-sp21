@@ -24,10 +24,15 @@ public class CommitMethod {
 
         String thisCommitID = sha1(serialize(commitObject)); // Generate a SHA for this commit object
 
-        // Save staging hashmap to this commits hashmap -- remember we are just saving the IDs of the blobs that are the versions of the files we want "saved" with this commit
-        File file = Utils.join(CWD, ".gitlet", "staging-hashmap");
+        // Open staging hashmap for access
+        File file = STAGING;
         HashMap stagingHashMap = readObject(file, HashMap.class);
-        commitObject.updateTrackedFiles(stagingHashMap);
+
+        // Copy staging hashmap to commit tracked files hashmap
+        commitObject.trackedFiles.putAll(stagingHashMap);
+
+        // Replace super files with staging hashmap values
+        commitObject.superFiles.putAll(stagingHashMap);
 
         // Clear staging hashmap
         stagingHashMap.clear();
@@ -41,7 +46,9 @@ public class CommitMethod {
         writeObject(head, commitObject);
     }
     /** Output:
-     * A new commit that has a reference to its parent commit, a hashmap that contains the IDs of the latest versions of the files it saves (which actual contents can then be found in blobs)
+     * A new commit that has a reference to its parent commit
+     * - the commit has a trackedFiles hashmap that contains a hashmap of ONLY files that got updated with this commit
+     * - the commit also has a superFiles hashmap that contains a hashmap of ALL files that exist and the IDs of the latest versions (which actual contents can then be found in blobs)
      * Updated head that contains serialized version of the latest commit on this branch
      * Emptied staging hashmap
      */
