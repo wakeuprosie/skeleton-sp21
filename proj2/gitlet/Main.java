@@ -38,6 +38,18 @@ public class Main {
                 validateNumArgs("commit", args, 2);
                 CommitMethod.commitMethod(args[1]);
                 break;
+            case "checkout":
+                if (args[1] == "--") {
+                    validateMinNumArgs("checkout", args, 3);
+                    CheckoutMethod.method1(args[2]);
+                } else if (args[2] == "--") {
+                    validateMinNumArgs("checkout", args, 4);
+                    CheckoutMethod.method2(args[2], args[3]);
+                } else {
+                    validateMinNumArgs("checkout", args, 2);
+                    CheckoutMethod.method3(args[1]);
+                }
+                break;
             default:
                 /** Failure: Exit if arg doesn't match any existing command */
                 System.out.println("No command with that name exists.");

@@ -14,7 +14,7 @@ public class Commit implements Serializable {
     private String message;
     private Instant time;
     private String parent;
-    private HashMap trackedFiles;
+    public HashMap trackedFiles;
 
     /** Constructor */
     public Commit (String message, String parentCommit) {
@@ -34,6 +34,10 @@ public class Commit implements Serializable {
     /** Method to update tracked files hashmap */
     public void updateTrackedFiles(HashMap object) {
         this.trackedFiles = object;
+    }
+
+    public gitlet.Commit getParent() {
+        return this.parent;
     }
 
 }
