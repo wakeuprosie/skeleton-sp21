@@ -26,12 +26,12 @@ public class Repository {
         // Check that .gitlet does NOT exist before proceeding
         if (!GITLET_DIR.isFile()) {
             GITLET_DIR.mkdirs();
-            STAGING.createNewFile();
+            STAGING.mkdirs();
             COMMITS_DIR.mkdirs();
             BLOBS_DIR.mkdirs();
             BRANCHES_DIR.mkdirs();
-            MASTER_DIR.createNewFile();
-            HEAD_DIR.createNewFile();
+            MASTER_DIR.mkdirs();
+            HEAD_DIR.mkdirs();
             setUpMotherCommit();
             setUpStaging();
         } else {

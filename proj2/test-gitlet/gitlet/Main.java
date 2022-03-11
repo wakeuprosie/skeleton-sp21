@@ -38,12 +38,11 @@ public class Main {
                 validateNumArgs("commit", args, 2);
                 CommitMethod.commitMethod(args[1]);
                 break;
-            default:
-                /** Failure: Exit if arg doesn't match any existing command */
-                System.out.println("No command with that name exists.");
-                System.exit(0);
         }
 
+        /** Failure: Exit if arg doesn't match any existing command */
+        System.out.println("No command with that name exists.");
+        System.exit(0);
 
     }
 
