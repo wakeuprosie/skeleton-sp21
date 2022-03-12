@@ -13,10 +13,10 @@ public class CheckoutMethod {
 
     /* Input: [file name] */
     public static void method1(String filename) {
-        File headCommit = Utils.join(CWD, ".gitlet", "branches", "head");
-        Commit headCommitOpened = Utils.readObject(headCommit, gitlet.Commit.class);
+        File headCommit = HEAD_DIR;
+        Commit headCommitOpened = readObject(headCommit, Commit.class);
 
-        // Get the parent commits hash map and the sha of this file
+        // Get the commits hash map and the sha of this file
         HashMap trackedFiles = headCommitOpened.trackedFiles;
 
         if (trackedFiles.get(filename) == null) { // Failure: there is no version of this file in the head commit
@@ -28,13 +28,11 @@ public class CheckoutMethod {
 
         File currentFileOnComputer = join(CWD, filename);
 
-        File blob = join(CWD, ".gitlet", "blobs", shaValue); // Get the sha file contents from blobs
+        File blob = join(BLOBS_DIR, shaValue); // Get the sha file contents from blobs
         assert(blob.exists()); // Double-check the file exists in blobs
-        writeContents(currentFileOnComputer, blob); // Write over cwd with the file from head
+        String blobString = readContentsAsString(blob);
 
-        return;
-
-        // Uhhh what happens to the OG file... I don't even know how you go back to og file on regular git so 0_0
+        writeContents(currentFileOnComputer, blobString); // Write over cwd with the file from head
 
         /** Output:
          * The file of interest in the CWD has been overwritten with the version that was in HEAD
@@ -113,7 +111,7 @@ public class CheckoutMethod {
 
         // Reassign HEAD to the branchname commit
         File headFile = HEAD_DIR;
-        writeObject(headFile, serialize(branchNameCommitOpened));
+        writeObject(headFile, branchNameCommitOpened);
 
     }
 

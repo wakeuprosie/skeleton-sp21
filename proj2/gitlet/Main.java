@@ -39,10 +39,10 @@ public class Main {
                 CommitMethod.commitMethod(args[1]);
                 break;
             case "checkout":
-                if (args[1] == "--") {
+                if (args.length == 3) {
                     validateMinNumArgs("checkout", args, 3);
                     CheckoutMethod.method1(args[2]);
-                } else if (args[2] == "--") {
+                } else if (args.length == 4) {
                     validateMinNumArgs("checkout", args, 4);
                     CheckoutMethod.method2(args[2], args[3]);
                 } else {

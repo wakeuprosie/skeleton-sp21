@@ -3,7 +3,8 @@ package gitlet;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import static gitlet.Repository.CWD;
+
+import static gitlet.Repository.*;
 import static gitlet.Utils.*;
 
 /** This class handles the logic for staging
@@ -25,11 +26,11 @@ public class Staging {
         // Body
         String fileID = sha1(serialize(currentFile)); // Get the SHA, aka ID of the current state, of the file of interest
 
-        File newBlobFile = Utils.join(CWD, ".gitlet", "blobs", fileID); // Store the file
+        File newBlobFile = Utils.join(BLOBS_DIR, fileID); // Store the file
         newBlobFile.createNewFile();
-        writeObject(newBlobFile, currentFile); // Serialize and save the file in the blob folder
+        writeContents(newBlobFile, readContents(currentFile)); // Serialize and save the file in the blob folder
 
-        File file = Utils.join(CWD, ".gitlet", "staging-hashmap");
+        File file = STAGING;
         HashMap staging = readObject(file, HashMap.class); // Deserialize staging hashmap
         if (!staging.containsKey(arg)) {
             staging.put(arg, fileID); // Save file name and latest version SHA in hashmap

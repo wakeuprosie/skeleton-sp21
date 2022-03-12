@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.*;
 import java.util.HashMap;
 
+import static gitlet.Repository.COMMITS_DIR;
 import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
 
@@ -23,22 +24,22 @@ public class Commit implements Serializable {
     public Commit (String message, String parentCommit) {
         // Commit object
         this.message = message;
+        this.trackedFiles = new HashMap();
+        this.superFiles = new HashMap();
         if (parentCommit == null) {
             this.time = Instant.EPOCH;
-            this.superFiles = new HashMap();
         } else {
+            this.parent = parentCommit;
             this.time = Instant.now();
-            this.parent = sha1(parentCommit);
 
             // Access parents superFiles hashmap
-            File parentCommitFile = join(CWD, ".gitlet", "commits", parentCommit);
-            Commit parentCommitobject = readObject(parentCommitFile, Commit.class);
-            HashMap parentSuperFiles = parentCommitobject.superFiles;
+            File parentCommitFile = join(COMMITS_DIR, parentCommit);
+            Commit parentCommitObject = readObject(parentCommitFile, Commit.class);
+            HashMap parentSuperFiles = parentCommitObject.superFiles;
 
             // Copy parent superFiles to this commit
             this.superFiles.putAll(parentSuperFiles);
         }
-        this.trackedFiles = new HashMap();
     }
 
     public String getParent() {

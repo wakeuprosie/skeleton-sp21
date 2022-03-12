@@ -2,9 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.util.HashMap;
-
-import static gitlet.Repository.CWD;
-import static gitlet.Repository.STAGING;
+import static gitlet.Repository.*;
 import static gitlet.Utils.*;
 import static gitlet.Utils.writeObject;
 
@@ -16,7 +14,7 @@ public class CommitMethod {
 
     public static void commitMethod(String message) {
 
-        File parent = Utils.join(CWD, ".gitlet", "branches", "head");  // Access the commit at HEAD -- the most recent commit in active branch
+        File parent = HEAD_DIR;  // Access the commit at HEAD -- the most recent commit in active branch
         Commit parentCommit = readObject(parent, Commit.class); // Deserialize parent commit into an accessible object
 
         String parentID = sha1(serialize(parentCommit));
@@ -38,11 +36,11 @@ public class CommitMethod {
         stagingHashMap.clear();
 
         // Create a commit folder
-        File thisCommitFolder = Utils.join(CWD, ".gitlet", "commits", thisCommitID); // Create a file for this commit
+        File thisCommitFolder = Utils.join(COMMITS_DIR, thisCommitID); // Create a file for this commit
         writeObject(thisCommitFolder, commitObject); // Save commit object to its place in commits folder
 
         // Move HEAD pointer
-        File head = join(CWD, ".gitlet", "branches", "head");
+        File head = HEAD_DIR;
         writeObject(head, commitObject);
     }
     /** Output:
