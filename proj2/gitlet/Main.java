@@ -54,6 +54,10 @@ public class Main {
                 validateNumArgs("rm", args, 2);
                 RemoveMethod.remove(args[1]);
                 break;
+            case "log":
+                validateNumArgs("log", args, 1);
+                LogMethod.log();
+                break;
             default:
                 /** Failure: Exit if arg doesn't match any existing command */
                 System.out.println("No command with that name exists.");

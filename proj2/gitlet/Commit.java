@@ -46,4 +46,12 @@ public class Commit implements Serializable {
         return this.parent;
     }
 
+    public String getMessage() {
+        return this.message;
+    }
+
+    public Instant getTime() {
+        return this.time;
+    }
+
 }
