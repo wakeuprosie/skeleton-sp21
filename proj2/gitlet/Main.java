@@ -50,6 +50,10 @@ public class Main {
                     CheckoutMethod.method3(args[1]);
                 }
                 break;
+            case "rm":
+                validateNumArgs("rm", args, 2);
+                RemoveMethod.remove(args[1]);
+                break;
             default:
                 /** Failure: Exit if arg doesn't match any existing command */
                 System.out.println("No command with that name exists.");
