@@ -72,8 +72,39 @@ public class CheckoutMethod {
 
         // Open the newest commit at given branch for access
         File branchNameCommit = Utils.join(BRANCHES_DIR, branchName);
+
+        /* THREE FAILURE CASES */
+        /* Failure 1: if branch doesn't exist -- exit */
+        if (!branchNameCommit.exists()) {
+            System.out.print("No such branch exists.");
+            return;
+        }
         Commit branchNameCommitOpened = Utils.readObject(branchNameCommit, Commit.class);
 
+        /* Failure 2: if already on the given branch -- exit */
+        if (currentBranch == branchName) {
+            System.out.println("No need to checkout the current branch.");
+            return;
+        }
+
+        /* Failure 3: if there is a file in the CWD but NOT in input branch */
+        File cwdDir = CWD;
+        List<String> cwdList = plainFilenamesIn(cwdDir);
+
+        HashMap branchNameCommitHash = branchNameCommitOpened.superFiles;
+
+        Iterator cwdListIterator = cwdList.iterator();
+
+        while (cwdListIterator.hasNext()) {
+            String fileName = (String) cwdListIterator.next();
+
+            if (!branchNameCommitHash.containsKey(fileName)) {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                return;
+            }
+        }
+
+        /* BODY */
         // Access the superFiles hashmap
         HashMap superFiles = branchNameCommitOpened.superFiles;
 
@@ -109,9 +140,12 @@ public class CheckoutMethod {
         HashMap stagingHashMap = readObject(file, HashMap.class);
         stagingHashMap.clear();
 
-        // Reassign HEAD to the branchname commit
+        // Reassign HEAD to the branch name commit
         File headFile = HEAD_DIR;
         writeObject(headFile, branchNameCommitOpened);
+
+        // Edit current branch value to new branch name
+        currentBranch = branchName;
 
     }
 

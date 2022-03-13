@@ -66,6 +66,10 @@ public class Main {
                 validateNumArgs("find", args, 2);
                 BranchMethod.branch(args[1]);
                 break;
+            case "rm-branch":
+                validateNumArgs("find", args, 2);
+                RmBranchMethod.rmBranch(args[1]);
+                break;
             default:
                 /** Failure: Exit if arg doesn't match any existing command */
                 System.out.println("No command with that name exists.");

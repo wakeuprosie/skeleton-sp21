@@ -20,7 +20,7 @@ public class Repository {
     public static final File BRANCHES_DIR = join(CWD, ".gitlet", "branches");
     public static final File MASTER_DIR = join(CWD, ".gitlet", "branches", "master");
     public static final File HEAD_DIR = join(CWD, ".gitlet", "branches", "head");
-    public static final File CURRENT_BRANCH_DIR = join(CWD, ".gitlet", "branches", "current-branch");
+    public static String currentBranch;
 
     /** Constructor */
     public static void setupPersistence() throws IOException {
@@ -33,7 +33,7 @@ public class Repository {
             BRANCHES_DIR.mkdirs();
             MASTER_DIR.createNewFile();
             HEAD_DIR.createNewFile();
-            CURRENT_BRANCH_DIR.createNewFile();
+            currentBranch = "master";
             setUpMotherCommit();
             setUpStaging();
             setUpSuperHashmap();
@@ -46,9 +46,9 @@ public class Repository {
     public static void setUpMotherCommit() {
         Commit motherCommitObject = new Commit("initial commit", null);
         String motherSHA = Utils.sha1(serialize(motherCommitObject));
-        File file = Utils.join(CWD, ".gitlet", "commits", motherSHA);
-        File file2 = Utils.join(CWD, ".gitlet", "branches", "head");
-        File file3 = Utils.join(CWD, ".gitlet","branches", "master");
+        File file = Utils.join(COMMITS_DIR, motherSHA);
+        File file2 = HEAD_DIR;
+        File file3 = MASTER_DIR;
         writeObject(file, motherCommitObject);
         writeObject(file2, motherCommitObject);
         writeObject(file3, motherCommitObject);
@@ -60,6 +60,7 @@ public class Repository {
         HashMap staging = new HashMap();
         File file = Utils.join(CWD, ".gitlet", "staging-hashmap"); // Create a pathname to save the staging hashmap
         writeObject(file, staging); // Read blank hashmap into that pathname
+
     }
 
     /** Initiate super hashmap */
@@ -67,6 +68,7 @@ public class Repository {
         HashMap superHashMap = new HashMap();
         File file = Utils.join(CWD, ".gitlet", "super-hashmap"); // Create a pathname to save the staging hashmap
         writeObject(file, superHashMap); // Read blank hashmap into that pathname
+
     }
 
 }

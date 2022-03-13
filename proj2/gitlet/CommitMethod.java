@@ -43,8 +43,10 @@ public class CommitMethod {
         File head = HEAD_DIR;
         writeObject(head, commitObject);
 
-        // Move current branch pointer
+        // Move the branch pointer that you're currently on
         File currentBranch = CURRENT_BRANCH_DIR;
+        writeObject(currentBranch, commitObject);
+
 
     }
     /** Output:
