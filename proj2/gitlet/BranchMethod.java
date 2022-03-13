@@ -1,7 +1,6 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 
 import static gitlet.Repository.BRANCHES_DIR;
 import static gitlet.Repository.HEAD_DIR;
@@ -19,6 +18,9 @@ public class BranchMethod {
 
         // Read the commit in head into this file
         writeObject(newBranch, headCommit);
-        
+
+        // Change the repository current branch to this branch
+        Repository.currentBranch = branchName;
+
     }
 }

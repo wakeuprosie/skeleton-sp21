@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 
 import static gitlet.Repository.COMMITS_DIR;
+import static gitlet.Repository.currentBranch;
 import static gitlet.Utils.*;
 
 
@@ -24,6 +25,7 @@ public class Commit implements Serializable {
     private String parent;
     public HashMap trackedFiles; // Files updated in this commit
     public HashMap superFiles; // A map of ALL files and their latest versions
+    public String ownerBranch; // The branch this commit belongs to
 
     /** Constructor */
     public Commit (String message, String parentCommit) {
@@ -34,9 +36,11 @@ public class Commit implements Serializable {
         if (parentCommit == null) {
             // this.time = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
             this.time = Instant.EPOCH;
+            this.ownerBranch = "master";
         } else {
             this.parent = parentCommit;
             this.time = Instant.now();
+            this.ownerBranch = currentBranch;
 
             // Access parents superFiles hashmap
             File parentCommitFile = join(COMMITS_DIR, parentCommit);

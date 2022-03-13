@@ -140,7 +140,7 @@ public class CheckoutMethod {
         HashMap stagingHashMap = readObject(file, HashMap.class);
         stagingHashMap.clear();
 
-        // Reassign HEAD to the branch name commit
+        // Edit HEAD pointer to the branch name commit
         File headFile = HEAD_DIR;
         writeObject(headFile, branchNameCommitOpened);
 
