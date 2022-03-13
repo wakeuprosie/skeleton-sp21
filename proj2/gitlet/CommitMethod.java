@@ -42,6 +42,10 @@ public class CommitMethod {
         // Move HEAD pointer
         File head = HEAD_DIR;
         writeObject(head, commitObject);
+
+        // Move current branch pointer
+        File currentBranch = CURRENT_BRANCH_DIR;
+
     }
     /** Output:
      * A new commit that has a reference to its parent commit

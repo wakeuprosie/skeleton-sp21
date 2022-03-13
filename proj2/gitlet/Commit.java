@@ -2,11 +2,14 @@ package gitlet;
 
 import java.io.File;
 import java.io.Serializable;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Date;
 import java.util.HashMap;
 
 import static gitlet.Repository.COMMITS_DIR;
-import static gitlet.Repository.CWD;
 import static gitlet.Utils.*;
 
 
@@ -15,7 +18,9 @@ import static gitlet.Utils.*;
 public class Commit implements Serializable {
 
     private String message;
+    // private Date time;
     private Instant time;
+    // private LocalDateTime time;
     private String parent;
     public HashMap trackedFiles; // Files updated in this commit
     public HashMap superFiles; // A map of ALL files and their latest versions
@@ -27,6 +32,7 @@ public class Commit implements Serializable {
         this.trackedFiles = new HashMap();
         this.superFiles = new HashMap();
         if (parentCommit == null) {
+            // this.time = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
             this.time = Instant.EPOCH;
         } else {
             this.parent = parentCommit;

@@ -58,6 +58,14 @@ public class Main {
                 validateNumArgs("log", args, 1);
                 LogMethod.log();
                 break;
+            case "find":
+                validateNumArgs("find", args, 2);
+                FindMethod.find(args[1]);
+                break;
+            case "branch":
+                validateNumArgs("find", args, 2);
+                BranchMethod.branch(args[1]);
+                break;
             default:
                 /** Failure: Exit if arg doesn't match any existing command */
                 System.out.println("No command with that name exists.");

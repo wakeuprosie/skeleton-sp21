@@ -71,8 +71,8 @@ public class CheckoutMethod {
     public static void method3(String branchName) {
 
         // Open the newest commit at given branch for access
-        File branchNameCommit = Utils.join(CWD, ".gitlet", "branches", "branchName");
-        Commit branchNameCommitOpened = Utils.readObject(branchNameCommit, gitlet.Commit.class);
+        File branchNameCommit = Utils.join(BRANCHES_DIR, branchName);
+        Commit branchNameCommitOpened = Utils.readObject(branchNameCommit, Commit.class);
 
         // Access the superFiles hashmap
         HashMap superFiles = branchNameCommitOpened.superFiles;

@@ -1,7 +1,8 @@
 package gitlet;
 
 import java.io.File;
-import java.util.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
 
@@ -29,24 +30,32 @@ public class LogMethod {
 
         // Print commit ID
         System.out.println("===");
-        System.out.format("Commit %s", sha1(object));
-        System.out.println();
+        System.out.println("commit " + sha1(serialize(object)));
+
+       /* ===
+        commit e881c9575d180a215d1a636545b8fd9abfb1d2bb
+        Date: Wed Dec 31 16:00:00 1969 -0800
+        initial commit*/
         // Print commit date
-        System.out.format("Date: %tT", object.getTime());
-        System.out.println();
+        Instant instant = object.getTime();
+        ZonedDateTime dateTime = instant.atZone(ZoneId.systemDefault());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM d HH:mm:ss uuuu xxxx");
+        String text = formatter.format(dateTime);
+        System.out.println("Date: " + text);
+
         // Print commit message
         System.out.println(object.getMessage());
+        System.out.println();
 
         // Access the parent commit to prep for recursion
         String parentCommitID = object.getParent();
 
         // Recurse, passing in the parent commit, as long as parent is not null
         if (parentCommitID != null) {
-            File blob = join(BLOBS_DIR, parentCommitID);
+            File blob = join(COMMITS_DIR, parentCommitID);
             Commit parentCommit = readObject(blob, Commit.class);
             helper(parentCommit);
         }
 
-        return;
     }
 }

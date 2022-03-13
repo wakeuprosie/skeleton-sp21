@@ -20,6 +20,7 @@ public class Repository {
     public static final File BRANCHES_DIR = join(CWD, ".gitlet", "branches");
     public static final File MASTER_DIR = join(CWD, ".gitlet", "branches", "master");
     public static final File HEAD_DIR = join(CWD, ".gitlet", "branches", "head");
+    public static final File CURRENT_BRANCH_DIR = join(CWD, ".gitlet", "branches", "current-branch");
 
     /** Constructor */
     public static void setupPersistence() throws IOException {
@@ -32,6 +33,7 @@ public class Repository {
             BRANCHES_DIR.mkdirs();
             MASTER_DIR.createNewFile();
             HEAD_DIR.createNewFile();
+            CURRENT_BRANCH_DIR.createNewFile();
             setUpMotherCommit();
             setUpStaging();
             setUpSuperHashmap();
