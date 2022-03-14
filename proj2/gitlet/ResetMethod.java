@@ -76,7 +76,7 @@ public class ResetMethod {
         stagingHashMap.clear();
 
         // Reassign HEAD to the branch name commit
-        File headFile = HEAD_DIR;
+        File headFile = HEAD;
         writeObject(headFile, inputCommitOpened);
 
         // Reassign this branch pointer

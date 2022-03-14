@@ -32,7 +32,7 @@ public class RemoveMethod {
 
         // Remove this file from current commit
         if (fileInCWD.exists()) {
-            File headFile = HEAD_DIR;
+            File headFile = HEAD;
             Commit headCommit = readObject(headFile, Commit.class);
             headCommit.trackedFiles.remove(filename);
             headCommit.superFiles.remove(filename);

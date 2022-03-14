@@ -16,10 +16,11 @@ public class Repository {
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File COMMITS_DIR = join(CWD, ".gitlet", "commits");
     public static final File STAGING = join(CWD, ".gitlet", "staging-hashmap");
+    public static final File STAGING_RM= join(CWD, ".gitlet", "staging-remove-hashmap");
     public static final File BLOBS_DIR = join(CWD, ".gitlet", "blobs");
     public static final File BRANCHES_DIR = join(CWD, ".gitlet", "branches");
-    public static final File MASTER_DIR = join(CWD, ".gitlet", "branches", "master");
-    public static final File HEAD_DIR = join(CWD, ".gitlet", "branches", "head");
+    public static final File MASTER = join(CWD, ".gitlet", "branches", "master");
+    public static final File HEAD = join(CWD, ".gitlet", "branches", "head");
     public static String currentBranch;
 
     /** Constructor */
@@ -28,11 +29,12 @@ public class Repository {
         if (!GITLET_DIR.isFile()) {
             GITLET_DIR.mkdirs();
             STAGING.createNewFile();
+            STAGING_RM.createNewFile();
             COMMITS_DIR.mkdirs();
             BLOBS_DIR.mkdirs();
             BRANCHES_DIR.mkdirs();
-            MASTER_DIR.createNewFile();
-            HEAD_DIR.createNewFile();
+            MASTER.createNewFile();
+            HEAD.createNewFile();
             currentBranch = "master";
             setUpMotherCommit();
             setUpStaging();
@@ -47,8 +49,8 @@ public class Repository {
         Commit motherCommitObject = new Commit("initial commit", null);
         String motherSHA = Utils.sha1(serialize(motherCommitObject));
         File file = Utils.join(COMMITS_DIR, motherSHA);
-        File file2 = HEAD_DIR;
-        File file3 = MASTER_DIR;
+        File file2 = HEAD;
+        File file3 = MASTER;
         writeObject(file, motherCommitObject);
         writeObject(file2, motherCommitObject);
         writeObject(file3, motherCommitObject);

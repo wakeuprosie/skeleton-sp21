@@ -14,7 +14,7 @@ public class LogMethod {
 
     public static void log() {
         // Access the head commit
-        File headFile = HEAD_DIR;
+        File headFile = HEAD;
         Commit headCommit = readObject(headFile, Commit.class);
 
         // Check if you're at initial commit

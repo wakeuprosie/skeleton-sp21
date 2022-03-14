@@ -24,6 +24,7 @@ public class Commit implements Serializable {
     // private LocalDateTime time;
     private String parent;
     public HashMap trackedFiles; // Files updated in this commit
+    public HashMap removedFiles; // Files removed in this commit
     public HashMap superFiles; // A map of ALL files and their latest versions
     public String ownerBranch; // The branch this commit belongs to
 
@@ -33,6 +34,7 @@ public class Commit implements Serializable {
         this.message = message;
         this.trackedFiles = new HashMap();
         this.superFiles = new HashMap();
+        this.removedFiles = new HashMap();
         if (parentCommit == null) {
             // this.time = LocalDateTime.ofEpochSecond(0, 0, ZoneOffset.ofHours(0));
             this.time = Instant.EPOCH;

@@ -13,7 +13,7 @@ public class CheckoutMethod {
 
     /* Input: [file name] */
     public static void method1(String filename) {
-        File headCommit = HEAD_DIR;
+        File headCommit = HEAD;
         Commit headCommitOpened = readObject(headCommit, Commit.class);
 
         // Get the commits hash map and the sha of this file
@@ -141,7 +141,7 @@ public class CheckoutMethod {
         stagingHashMap.clear();
 
         // Edit HEAD pointer to the branch name commit
-        File headFile = HEAD_DIR;
+        File headFile = HEAD;
         writeObject(headFile, branchNameCommitOpened);
 
         // Edit current branch value to new branch name

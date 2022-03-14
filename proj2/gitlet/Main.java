@@ -70,6 +70,10 @@ public class Main {
                 validateNumArgs("find", args, 2);
                 RmBranchMethod.rmBranch(args[1]);
                 break;
+            case "merge":
+                validateNumArgs("merge", args, 2);
+                MergeMethod.merge(args[1]);
+                break;
             default:
                 /** Failure: Exit if arg doesn't match any existing command */
                 System.out.println("No command with that name exists.");

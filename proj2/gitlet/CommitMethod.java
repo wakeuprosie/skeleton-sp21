@@ -2,6 +2,8 @@ package gitlet;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Set;
+
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
 import static gitlet.Utils.writeObject;
@@ -14,7 +16,7 @@ public class CommitMethod {
 
     public static void commitMethod(String message) {
 
-        File parent = HEAD_DIR;  // Access the commit at HEAD -- the most recent commit in active branch
+        File parent = HEAD;  // Access the commit at HEAD -- the most recent commit in active branch
         Commit parentCommit = readObject(parent, Commit.class); // Deserialize parent commit into an accessible object
 
         String parentID = sha1(serialize(parentCommit));
@@ -22,7 +24,8 @@ public class CommitMethod {
 
         String thisCommitID = sha1(serialize(commitObject)); // Generate a SHA for this commit object
 
-        // Open staging hashmap for access
+        /** HANDLE STAGING FOR ADD */
+        // Access staging for add hashmap
         File file = STAGING;
         HashMap stagingHashMap = readObject(file, HashMap.class);
 
@@ -35,12 +38,35 @@ public class CommitMethod {
         // Clear staging hashmap
         stagingHashMap.clear();
 
+        /** HANDLE STAGING FOR REMOVE */
+        // Access staging for remove hashmap
+        File removeFile = STAGING_RM;
+        HashMap stagingRmHashMap = readObject(removeFile, HashMap.class);
+
+        // Copy staging for remove hashmap to commit removed files hashmap
+        commitObject.removedFiles.putAll(stagingRmHashMap);
+
+        // Remove files from commit super files hashmap
+        Set rmKeys = stagingRmHashMap.keySet();
+        for (Object key : rmKeys) {
+            commitObject.superFiles.remove(key);
+
+            // Remove file from CWD
+            restrictedDelete((String) key);
+        }
+
+
+
+
+
+
+        /** LOGIC TO FINISH THE COMMIT METHOD */
         // Create a commit folder
         File thisCommitFolder = Utils.join(COMMITS_DIR, thisCommitID); // Create a file for this commit
         writeObject(thisCommitFolder, commitObject); // Save commit object to its place in commits folder
 
         // Move HEAD pointer
-        File head = HEAD_DIR;
+        File head = HEAD;
         writeObject(head, commitObject);
 
     }
