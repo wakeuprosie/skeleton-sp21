@@ -31,10 +31,14 @@ public class Main {
             case "add":
                 validateMinNumArgs("add", args, 1);
                 for (int i = 1; i < args.length; i += 1) {
-                    gitlet.Staging.add(args[i]);
+                    gitlet.AddMethod.add(args[i]);
                 }
                 break;
             case "commit":
+                if (args.length == 1) {
+                    System.out.println("Please enter a commit message.");
+                    System.exit(0);
+                }
                 validateNumArgs("commit", args, 2);
                 CommitMethod.commitMethod(args[1]);
                 break;

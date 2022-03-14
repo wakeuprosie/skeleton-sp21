@@ -17,7 +17,7 @@ public class CheckoutMethod {
         Commit headCommitOpened = readObject(headCommit, Commit.class);
 
         // Get the commits hash map and the sha of this file
-        HashMap trackedFiles = headCommitOpened.trackedFiles;
+        HashMap trackedFiles = headCommitOpened.getTrackedFiles();
 
         if (trackedFiles.get(filename) == null) { // Failure: there is no version of this file in the head commit
             System.out.println("File does not exist in that commit.");
@@ -58,7 +58,7 @@ public class CheckoutMethod {
         Commit commitOpened = readObject(commitFile, Commit.class); // Confirmed commit exists. Open it for access.
 
         // Get the file in the commit
-        HashMap trackedFiles = commitOpened.trackedFiles;
+        HashMap trackedFiles = commitOpened.getTrackedFiles();
         String blobID = (String) trackedFiles.get(fileName);
         File blob = join(CWD, ".gitlet", "blobs", blobID);
 
@@ -91,7 +91,7 @@ public class CheckoutMethod {
         File cwdDir = CWD;
         List<String> cwdList = plainFilenamesIn(cwdDir);
 
-        HashMap branchNameCommitHash = branchNameCommitOpened.superFiles;
+        HashMap branchNameCommitHash = branchNameCommitOpened.getSuperFiles();
 
         Iterator cwdListIterator = cwdList.iterator();
 
@@ -106,7 +106,7 @@ public class CheckoutMethod {
 
         /* BODY */
         // Access the superFiles hashmap
-        HashMap superFiles = branchNameCommitOpened.superFiles;
+        HashMap superFiles = branchNameCommitOpened.getSuperFiles();
 
         // A set of all the filenames that existed up to this commit
         Set<String> allSuperFileNames = superFiles.keySet();

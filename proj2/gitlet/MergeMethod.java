@@ -3,46 +3,47 @@ package gitlet;
 import java.io.File;
 import java.util.*;
 
+import static gitlet.CommitMethod.commitMethod;
 import static gitlet.Repository.*;
-import static gitlet.Staging.specialStagingAdd;
-import static gitlet.Staging.specialStagingRemove;
+import static gitlet.AddMethod.*;
 import static gitlet.Utils.*;
 
 public class MergeMethod {
 
     /* Helper that grabs the parent commit object of any commit */
     private static Commit grabParentCommit(Commit object) {
-        String parentID = object.getParent();
+        String parentID = object.getFirstParent();
 
         if (parentID == null) {
             return null;
         }
 
         File parentFile = join(COMMITS_DIR, parentID);
-        Commit parentCommit = readObject(parentFile, Commit.class);
-        return parentCommit;
+        return readObject(parentFile, Commit.class);
     }
 
-    /* This loop works by comparing timestamps and seeing which is earlier */
+    /* Helper that finds split point via timestamp comparisons */
     private static String splitPointFinder(Commit currentBranchCommit, Commit inputBranchCommit) {
 
-        // If the commits are equal, return the sha of either (they should be the same)
+        // Base case: if the commits are equal, return the sha of one of them
         if (currentBranchCommit.equals(inputBranchCommit)) {
             return sha1(serialize(currentBranchCommit));
-        }
-        // Compare the two commit time stamps
-        // Whichever one is later, go to the parent commit of that one until the commits EQUAL
-        else if (currentBranchCommit.getTime().isAfter(inputBranchCommit.getTime())) {
-            Commit currentBranchCommitParent = grabParentCommit(currentBranchCommit);
-            return splitPointFinder(currentBranchCommitParent, inputBranchCommit);
-        } else if (currentBranchCommit.getTime().isBefore(inputBranchCommit.getTime()); {
-            Commit inputBranchCommitParent = grabParentCommit(inputBranchCommit);
-            return splitPointFinder(currentBranchCommit, inputBranchCommitParent);
+        } else {
+            // Compare the two commit time stamps
+            // Whichever is later, go to the parent commit of that one until base case
+            if (currentBranchCommit.getTime().isAfter(inputBranchCommit.getTime())) {
+                Commit currentBranchCommitParent = grabParentCommit(currentBranchCommit);
+                return splitPointFinder(currentBranchCommitParent, inputBranchCommit);
+            } else {
+                Commit inputBranchCommitParent = grabParentCommit(inputBranchCommit);
+                return splitPointFinder(currentBranchCommit, inputBranchCommitParent);
+            }
+
         }
 
     }
 
-    // At the end of this bullshit, merge automatically performs a commit method
+    // Automatic commit
     public static void merge(String inputBranchName) {
 
         File currentBranchFile = join(BRANCHES_DIR, currentBranch);
@@ -51,16 +52,16 @@ public class MergeMethod {
         // Failure: check if you're currently on the input branch -- exit
         if (currentBranch.equals(inputBranchName)) {
             System.out.println("Cannot merge a branch with itself.");
-            return;
+            System.exit(0);
         }
 
         // Failure: check if branch doesn't exist -- exit
         if (!inputBranchFile.exists()) {
             System.out.println("A branch with that name does not exist.");
-            return;
+            System.exit(0);
         }
 
-        // Access the triad of commits
+        // Access the three of commits
         Commit currentBranchCommit = readObject(currentBranchFile, Commit.class);
         Commit inputBranchCommit = readObject(inputBranchFile, Commit.class);
         String splitCommitID = splitPointFinder(currentBranchCommit, inputBranchCommit);
@@ -68,19 +69,19 @@ public class MergeMethod {
         Commit splitCommit = readObject(splitCommitFile, Commit.class);
 
         // Combine three commits super files UNIQUE set of all keys
-        HashMap currentHash = currentBranchCommit.superFiles;
-        HashMap inputHash = inputBranchCommit.superFiles;
-        HashMap splitHash = splitCommit.superFiles;
+        HashMap currentHash = currentBranchCommit.getSuperFiles();
+        HashMap inputHash = inputBranchCommit.getSuperFiles();
+        HashMap splitHash = splitCommit.getSuperFiles();
 
-        Set<String> currentKeys = currentHash.keySet();
-        Set<String> inputKeys = inputHash.keySet();
-        Set<String> splitKeys = splitHash.keySet();
-        Set<String> ultimateHash = Collections.emptySet();
+        Set currentKeys = currentHash.keySet();
+        Set inputKeys = inputHash.keySet();
+        Set splitKeys = splitHash.keySet();
+        List ultimateHash = new ArrayList<String>();
         ultimateHash.addAll(currentKeys);
         ultimateHash.addAll(inputKeys);
         ultimateHash.addAll(splitKeys);
 
-        /** For each file in the ultimate list, check the condition in
+        /* For each file in the ultimate list, check the condition in
          * currentCommit and inputCommit and check the following conditions */
         Iterator<String> ultimateHashIterator = ultimateHash.iterator();
 
@@ -93,20 +94,17 @@ public class MergeMethod {
 
             // Condition group: split, current, and input ALL have the file
 
-            if (splitHash.containsKey(fileNameFromIterator) && currentHash.containsKey(fileNameFromIterator) && importHash.containsKey(fileNameFromIterator)) {
+            if (splitHash.containsKey(fileNameFromIterator) && currentHash.containsKey(fileNameFromIterator) && inputHash.containsKey(fileNameFromIterator)) {
 
-                /** Condition 1:
+                /* Condition 1:
                 IF split = input, split != current
                 THEN stage the version in input for addition */
-
                 if (!splitSHA.equals(currentSHA) && splitSHA.equals(inputSHA)) {
-                    File stagingFile = STAGING;
-                    HashMap stagingMap = readObject(stagingFile, HashMap.class);
                     specialStagingAdd(fileNameFromIterator, splitSHA);
                     continue;
                 }
 
-                /** Condition 2:
+                /* Condition 2:
                  IF split != input, split = current
                  THEN do nothing */
                 if (splitSHA.equals(currentSHA) && !splitSHA.equals(inputSHA)) {
@@ -115,14 +113,11 @@ public class MergeMethod {
 
             }
 
-            /** Condition 3a:
+            /* Condition 3a:
              * IF exists in split, modified in input, modified in current
              THEN do nothing */
-            if (!splitSHA.equals(currentSHA) && !splitSHA.equals(inputSHA) && currentSHA.equals(inputSHA)) {
-                continue;
-            }
 
-            /** Condition 3b: AKA CONFLICT
+            /* Condition 3b: AKA CONFLICT
              * IF exists in split, modified in input, modified in current
              THEN CONFLICT */
             if (!splitSHA.equals(currentSHA) && !splitSHA.equals(inputSHA) && !currentSHA.equals(inputSHA)) {
@@ -142,7 +137,7 @@ public class MergeMethod {
 
             }
 
-            /** Condition 4:
+            /* Condition 4:
              * IF NOT in split, IN current, NOT in import
              THEN stage for removal */
             if (!splitHash.containsKey(fileNameFromIterator) && currentHash.containsKey(fileNameFromIterator) && !inputHash.containsKey(fileNameFromIterator)) {
@@ -151,40 +146,30 @@ public class MergeMethod {
                 specialStagingRemove(fileNameFromIterator);
             }
 
-            /** Condition 5:
+            /* Condition 5:
              * IF NOT in split, NOT in current, IN import
              THEN stage import version for adding */
             if (!splitHash.containsKey(fileNameFromIterator) && !currentHash.containsKey(fileNameFromIterator) && inputHash.containsKey(fileNameFromIterator)) {
-                File stagingFile = STAGING;
-                HashMap stagingMap = readObject(stagingFile, HashMap.class);
                 specialStagingAdd(fileNameFromIterator, inputSHA);
                 continue;
             }
 
-            /** Condition 6:
+            /* Condition 6:
              * IF in split, NOT changed in current, NOT IN import
              THEN stage for removal */
             if (!splitSHA.equals(currentSHA) && !inputHash.containsKey(fileNameFromIterator)) {
                 specialStagingRemove(fileNameFromIterator);
             }
 
-            /** Condition 7:
+            /* Condition 7:
              * IF in split, NOT IN current, NOT changed in import
              THEN do nothing */
-            if (!splitSHA.equals(inputSHA) && !currentHash.containsKey(fileNameFromIterator)) {
-                continue;
-            }
-
-            // Call commit method at the very end
-            String string = "Merged " + currentBranch + "into " + inputBranchName;
-            CommitMethod.commitMethod(string);
-
-            /** Merge commits differ from other commits: they record as parents both the head of
-             * the current branch (called the first parent) and the head of the branch given on the command line to be merged in.
-             */
-
-
 
         }
+
+        /* Call commit method at the very end */
+        String string = "Merged " + currentBranch + "into " + inputBranchName;
+        commitMethod(string, sha1(serialize(inputBranchCommit)));
+
     }
 }

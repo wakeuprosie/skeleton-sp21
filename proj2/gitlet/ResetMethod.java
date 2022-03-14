@@ -41,7 +41,7 @@ public class ResetMethod {
 
         /* BODY */
         // Access the superFiles hashmap
-        HashMap superFiles = inputCommitOpened.superFiles;
+        HashMap superFiles = inputCommitOpened.getSuperFiles();
 
         // A set of all the filenames that existed up to this commit
         Set<String> allSuperFileNames = superFiles.keySet();
@@ -80,7 +80,7 @@ public class ResetMethod {
         writeObject(headFile, inputCommitOpened);
 
         // Reassign this branch pointer
-        String inputCommitBranchName = inputCommitOpened.ownerBranch;
+        String inputCommitBranchName = inputCommitOpened.getOwnerBranch();
         File branchFile = join(BRANCHES_DIR, inputCommitBranchName);
         writeObject(branchFile, inputCommitOpened);
 

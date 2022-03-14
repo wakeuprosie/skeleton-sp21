@@ -34,8 +34,8 @@ public class RemoveMethod {
         if (fileInCWD.exists()) {
             File headFile = HEAD;
             Commit headCommit = readObject(headFile, Commit.class);
-            headCommit.trackedFiles.remove(filename);
-            headCommit.superFiles.remove(filename);
+            headCommit.getTrackedFiles().remove(filename);
+            headCommit.getSuperFiles().remove(filename);
         }
 
         // Remove from CWD

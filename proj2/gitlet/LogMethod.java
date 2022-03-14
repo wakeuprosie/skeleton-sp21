@@ -48,7 +48,7 @@ public class LogMethod {
         System.out.println();
 
         // Access the parent commit to prep for recursion
-        String parentCommitID = object.getParent();
+        String parentCommitID = object.getFirstParent();
 
         // Recurse, passing in the parent commit, as long as parent is not null
         if (parentCommitID != null) {
