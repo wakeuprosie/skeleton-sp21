@@ -56,10 +56,7 @@ public class CommitMethod {
             // Remove files from commit super files hashmap
             Set rmKeys = stagingRmHashMap.keySet();
             for (Object key : rmKeys) {
-                newCommitObject.getSuperFiles().remove(key);
-
-                // Remove file from CWD
-                restrictedDelete((String) key);
+                newCommitObject.superFiles.remove(key);
             }
             // Clear staging rm hashmap
             stagingRmHashMap.clear();

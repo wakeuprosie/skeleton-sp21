@@ -2,6 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.IDN;
 import java.util.*;
 
 import static gitlet.CommitMethod.commitMethod;
@@ -24,20 +25,21 @@ public class MergeMethod {
     }
 
     /* Helper that finds split point via timestamp comparisons */
-    private static String splitPointFinder(Commit currentBranchCommit, Commit inputBranchCommit) {
+    private static String splitPointFinder(String currentBranchCommitID, String inputBranchCommitID) {
 
-        // Base case: if the commits are equal, return the sha of one of them
-        if (currentBranchCommit.equals(inputBranchCommit)) {
-            return sha1(serialize(currentBranchCommit));
+        // Base case: if the commit IDs are equal, return one of them
+        if (currentBranchCommitID.equals(inputBranchCommitID)) { // This doesn't recognize that the commits are equal == Compare the parentIDs instead of the parent Commits first, then use the commits
+            return currentBranchCommitID;
         } else {
             // Compare the two commit time stamps
             // Whichever is later, go to the parent commit of that one until base case
+            Commit currentBranchCommit = readObject(join(COMMITS_DIR, currentBranchCommitID), Commit.class);
+            Commit inputBranchCommit = readObject(join(COMMITS_DIR, inputBranchCommitID), Commit.class);
+
             if (currentBranchCommit.getTime().isAfter(inputBranchCommit.getTime())) {
-                Commit currentBranchCommitParent = grabParentCommit(currentBranchCommit);
-                return splitPointFinder(currentBranchCommitParent, inputBranchCommit);
+                return splitPointFinder(currentBranchCommit.firstParent, inputBranchCommitID);
             } else {
-                Commit inputBranchCommitParent = grabParentCommit(inputBranchCommit);
-                return splitPointFinder(currentBranchCommit, inputBranchCommitParent);
+                return splitPointFinder(currentBranchCommitID, inputBranchCommit.firstParent);
             }
 
         }
@@ -47,7 +49,6 @@ public class MergeMethod {
     // Automatic commit
     public static void merge(String inputBranchName) throws IOException {
 
-        File currentBranchFile = CURRENT_BRANCH;
         File inputBranchFile = join(BRANCHES_DIR, inputBranchName);
 
         // Failure: check if you're currently on the input branch -- exit
@@ -63,9 +64,12 @@ public class MergeMethod {
         }
 
         // Access the three of commits
-        Commit currentBranchCommit = readObject(currentBranchFile, Commit.class);
-        Commit inputBranchCommit = readObject(inputBranchFile, Commit.class);
-        String splitCommitID = splitPointFinder(currentBranchCommit, inputBranchCommit);
+        File currentBranchCommitID = join(BRANCHES_DIR, readContentsAsString(CURRENT_BRANCH));
+        Commit currentBranchCommit = readObject(join(COMMITS_DIR, readContentsAsString(currentBranchCommitID)), Commit.class);
+        File inputBranchID = join(BRANCHES_DIR, inputBranchName);
+        Commit inputBranchCommit = readObject(join(COMMITS_DIR, readContentsAsString(inputBranchID)), Commit.class);
+        // Get the ID of the current branch -- get the current branch name, find that file in branches, read the file as string
+        String splitCommitID = splitPointFinder(readContentsAsString(currentBranchCommitID), readContentsAsString(inputBranchID));
         File splitCommitFile = join(COMMITS_DIR, splitCommitID);
         Commit splitCommit = readObject(splitCommitFile, Commit.class);
 
@@ -79,8 +83,21 @@ public class MergeMethod {
         Set splitKeys = splitHash.keySet();
         List ultimateHash = new ArrayList<String>();
         ultimateHash.addAll(currentKeys);
-        ultimateHash.addAll(inputKeys);
-        ultimateHash.addAll(splitKeys);
+        // Iterate through input and split -- only add missing keys
+        Iterator inputKeysIterator = inputKeys.iterator();
+        while (inputKeysIterator.hasNext()) {
+            String key = (String) inputKeysIterator.next();
+            if (!ultimateHash.contains(key)) {
+                ultimateHash.add(key);
+            }
+        }
+        Iterator splitKeysIterator = splitKeys.iterator();
+        while (splitKeysIterator.hasNext()) {
+            String key = (String) splitKeysIterator.next();
+            if (!ultimateHash.contains(key)) {
+                ultimateHash.add(key);
+            }
+        }
 
         /* For each file in the ultimate list, check the condition in
          * currentCommit and inputCommit and check the following conditions */
@@ -98,25 +115,61 @@ public class MergeMethod {
             if (splitHash.containsKey(fileNameFromIterator) && currentHash.containsKey(fileNameFromIterator) && inputHash.containsKey(fileNameFromIterator)) {
 
                 /* Condition 1:
-                IF split = input, split != current
-                THEN stage the version in input for addition */
+                IF split != current, current != input, split = input:
+                THEN stage the version in current for addition */
                 if (!splitSHA.equals(currentSHA) && splitSHA.equals(inputSHA)) {
-                    specialStagingAdd(fileNameFromIterator, splitSHA);
+                    specialStagingAdd(fileNameFromIterator, currentSHA);
                     continue;
                 }
 
                 /* Condition 2:
-                 IF split != input, split = current
-                 THEN do nothing */
+                 IF split = current, current != input
+                 THEN save the input version */
                 if (splitSHA.equals(currentSHA) && !splitSHA.equals(inputSHA)) {
+                    specialStagingAdd(fileNameFromIterator, inputSHA);
+
+                    // Update file on CWD
+                    writeContents(join(CWD, fileNameFromIterator), readContentsAsString(join(BLOBS_DIR, inputSHA)));
                     continue;
                 }
 
             }
 
-            /* Condition 3a:
+            /* Condition 4:
+             * IF NOT in split, IN current, NOT in import
+             THEN stage for removal */
+            if (!splitHash.containsKey(fileNameFromIterator) && currentHash.containsKey(fileNameFromIterator) && !inputHash.containsKey(fileNameFromIterator)) {
+                // Add to staging for remove hashmap
+                specialStagingRemove(fileNameFromIterator);
+                continue;
+            }
+
+            /* Condition 5:
+             * IF NOT in split, NOT in current, IN import
+             THEN stage input version for adding */
+            if (!splitHash.containsKey(fileNameFromIterator) && !currentHash.containsKey(fileNameFromIterator) && inputHash.containsKey(fileNameFromIterator)) {
+                specialStagingAdd(fileNameFromIterator, inputSHA);
+
+                // Add to CWD
+                File newFile = join(CWD, fileNameFromIterator);
+                newFile.createNewFile();
+                writeContents(newFile, readContentsAsString(join(BLOBS_DIR, inputSHA)));
+                continue;
+            }
+
+             /* Condition 3aa:
+             * IF exists in split, removed in input, removed in current
+             THEN do nothing */
+            if (splitHash.containsKey(fileNameFromIterator) && !inputHash.containsKey(fileNameFromIterator) && !currentHash.containsKey(fileNameFromIterator)) {
+                continue;
+            }
+
+            /* Condition 3ab:
              * IF exists in split, modified in input, modified in current
              THEN do nothing */
+            if (splitHash.containsKey(fileNameFromIterator) && !inputHash.equals(splitHash) && inputHash.equals(currentHash)) {
+                continue;
+            }
 
             /* Condition 3b: AKA CONFLICT
              * IF exists in split, modified in input, modified in current
@@ -138,28 +191,14 @@ public class MergeMethod {
 
             }
 
-            /* Condition 4:
-             * IF NOT in split, IN current, NOT in import
-             THEN stage for removal */
-            if (!splitHash.containsKey(fileNameFromIterator) && currentHash.containsKey(fileNameFromIterator) && !inputHash.containsKey(fileNameFromIterator)) {
-
-                // Add to staging for remove hashmap
-                specialStagingRemove(fileNameFromIterator);
-            }
-
-            /* Condition 5:
-             * IF NOT in split, NOT in current, IN import
-             THEN stage import version for adding */
-            if (!splitHash.containsKey(fileNameFromIterator) && !currentHash.containsKey(fileNameFromIterator) && inputHash.containsKey(fileNameFromIterator)) {
-                specialStagingAdd(fileNameFromIterator, inputSHA);
-                continue;
-            }
-
             /* Condition 6:
              * IF in split, NOT changed in current, NOT IN import
              THEN stage for removal */
-            if (!splitSHA.equals(currentSHA) && !inputHash.containsKey(fileNameFromIterator)) {
+            if (splitSHA.equals(currentSHA) && !inputHash.containsKey(fileNameFromIterator)) {
                 specialStagingRemove(fileNameFromIterator);
+
+                // Remove from CWD
+                join(CWD, fileNameFromIterator).delete();
             }
 
             /* Condition 7:

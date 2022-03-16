@@ -27,19 +27,20 @@ public class RemoveMethod {
 
         // Remove from staging hashmap if it exists
         stagingOpened.remove(filename);
+
         // Close up staging hashmap and re-save
         writeObject(stagingFile, stagingOpened);
 
-        // Remove this file from current commit
-        if (fileInCWD.exists()) {
-            File headFile = HEAD;
-            Commit headCommit = readObject(headFile, Commit.class);
-            headCommit.getTrackedFiles().remove(filename);
-            headCommit.getSuperFiles().remove(filename);
-        }
+        // Stage for removal
+        // Add to staging for remove hashmap
+        HashMap stagingRm = readObject(STAGING_RM, HashMap.class);
+        stagingRm.put(filename, null);
+
+        // Close up staging for rm hashmap and re-save
+        writeObject(STAGING_RM, stagingRm);
 
         // Remove from CWD
-        restrictedDelete(fileInCWD);
+        fileInCWD.delete();
 
     }
 }

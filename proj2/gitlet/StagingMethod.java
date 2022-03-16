@@ -1,5 +1,6 @@
 package gitlet;
 
+import javax.print.DocFlavor;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,6 +39,25 @@ public class StagingMethod {
      * New file in blobs with saved file - file name is the sha ID
      * New (or updated) key:value pair in staging hashmap (key:value == filename:fileSHAID)
      */
+    public static void stageToRm(String arg) throws IOException {
+
+        // Failure: check file exists on computer
+        if (!Utils.join(CWD, arg).exists()) { //
+            System.out.println("File does not exist.");
+            return;
+        }
+
+        // Get sha of this file from current commit
+        HashMap superFiles = readObject(join(COMMITS_DIR, readContentsAsString(HEAD)), Commit.class).superFiles;
+        String fileVersionID = (String) superFiles.get(arg);
+
+        // Add filename : sha to staging-for-remove hashmap
+        HashMap stagingRm = readObject(STAGING_RM, HashMap.class);
+        stagingRm.put(arg, fileVersionID);
+        writeObject(STAGING_RM, stagingRm);
+    }
+
+
 
     /* Special version of staging for add for use with merge
     Difference from above: uses specific version of file rather than what's on cwd
