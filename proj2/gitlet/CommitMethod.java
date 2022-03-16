@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -14,29 +15,16 @@ import static gitlet.Utils.writeObject;
 
 public class CommitMethod {
 
-    public static void commitMethod(String message, String secondParentID) {
+    public static void commitMethod(String message) throws IOException {
 
-        // Access the head commit
-        File parent = HEAD;
-        Commit parentCommit = readObject(parent, Commit.class);
-        String parentID = sha1(serialize(parentCommit));
-        Commit commitObject;
+        // Access the commit at head
+        String parentID = readContentsAsString(HEAD);
 
-        // Construct a new commit object
-        if (secondParentID == null) {
-            commitObject = new Commit(message, parentID, null);
-        } else {
-            commitObject = new Commit(message, parentID, secondParentID);
-        }
-
-        // Give the new commit an ID
-        String thisCommitID = sha1(serialize(commitObject));
-
-        // Access staging maps
-        File file = STAGING;
-        HashMap stagingHashMap = readObject(file, HashMap.class);
-        File removeFile = STAGING_RM;
-        HashMap stagingRmHashMap = readObject(removeFile, HashMap.class);
+        // Access staging maps to put in new commit
+        File stagingFile = STAGING;
+        HashMap stagingHashMap = readObject(stagingFile, HashMap.class);
+        File stagingRmFile = STAGING_RM;
+        HashMap stagingRmHashMap = readObject(stagingRmFile, HashMap.class);
 
         // Failure: no files staged for add or remove
         if (stagingHashMap.isEmpty() && stagingRmHashMap.isEmpty()) {
@@ -44,39 +32,54 @@ public class CommitMethod {
             System.exit(0);
         }
 
+        // Construct a new commit object
+        Commit newCommitObject = new Commit(message, parentID, null);
+
         /* HANDLE STAGING FOR ADD */
-        // Copy staging hashmap to commit tracked files hashmap
-        commitObject.getTrackedFiles().putAll(stagingHashMap);
+        // Copy staging hashmaps to new commit
+        newCommitObject.trackedFiles.putAll(stagingHashMap);
+        // If the key in staging doesn't exist in superfiles, add it
+        // If the key in staging does exist in superfiles, update it
+        newCommitObject.superFiles.putAll(stagingHashMap);
 
-        // Replace super files with staging hashmap values
-        commitObject.getSuperFiles().putAll(stagingHashMap);
-
-        // Clear staging hashmap
+        // Clear staging hashmap and re-save in folder
         stagingHashMap.clear();
+        writeObject(STAGING, stagingHashMap);
 
         /* HANDLE STAGING FOR REMOVE */
-        // Copy staging for remove hashmap to commit removed files hashmap
-        commitObject.getRemovedFiles().putAll(stagingRmHashMap);
+        // Check if nothing in staging rm hashmap
+        if (!stagingRmHashMap.isEmpty()) {
 
-        // Remove files from commit super files hashmap
-        Set rmKeys = stagingRmHashMap.keySet();
-        for (Object key : rmKeys) {
-            commitObject.getSuperFiles().remove(key);
+            // Copy to new commit
+            newCommitObject.getRemovedFiles().putAll(stagingRmHashMap);
 
-            // Remove file from CWD
-            restrictedDelete((String) key);
+            // Remove files from commit super files hashmap
+            Set rmKeys = stagingRmHashMap.keySet();
+            for (Object key : rmKeys) {
+                newCommitObject.getSuperFiles().remove(key);
+
+                // Remove file from CWD
+                restrictedDelete((String) key);
+            }
+            // Clear staging rm hashmap
+            stagingRmHashMap.clear();
+            writeObject(STAGING_RM, stagingHashMap);
         }
-        // Clear staging rm hashmap
-        stagingRmHashMap.clear();
+
 
         /** LOGIC TO FINISH THE COMMIT METHOD */
-        // Create a commit folder
-        File thisCommitFolder = Utils.join(COMMITS_DIR, thisCommitID); // Create a file for this commit
-        writeObject(thisCommitFolder, commitObject); // Save commit object to its place in commits folder
+        // Save new commit in commits folder
+        String newCommitID = Utils.sha1(serialize(newCommitObject));
+        File newCommitFile = join(COMMITS_DIR, newCommitID); // Create a file for this commit
+        newCommitFile.createNewFile();
+        writeObject(newCommitFile, newCommitObject); // Save commit object to its place in commits folder
 
         // Move HEAD pointer
-        File head = HEAD;
-        writeObject(head, commitObject);
+        writeContents(HEAD, newCommitID);
+
+        // Move current branch pointer (change the branch name it holds)
+        File currentBranchPointer = join(BRANCHES_DIR, readContentsAsString(CURRENT_BRANCH));
+        writeContents(currentBranchPointer, newCommitID);
 
     }
     /** Output:

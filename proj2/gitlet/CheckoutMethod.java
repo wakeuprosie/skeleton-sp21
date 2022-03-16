@@ -13,11 +13,10 @@ public class CheckoutMethod {
 
     /* Input: [file name] */
     public static void method1(String filename) {
-        File headCommit = HEAD;
-        Commit headCommitOpened = readObject(headCommit, Commit.class);
+        Commit headCommitOpened = readObject(join(COMMITS_DIR, readContentsAsString(HEAD)), Commit.class);
 
         // Get the commits hash map and the sha of this file
-        HashMap trackedFiles = headCommitOpened.getTrackedFiles();
+        HashMap trackedFiles = headCommitOpened.getSuperFiles();
 
         if (trackedFiles.get(filename) == null) { // Failure: there is no version of this file in the head commit
             System.out.println("File does not exist in that commit.");
@@ -45,13 +44,8 @@ public class CheckoutMethod {
 
         File file = join(CWD, fileName);
 
-        // Assert the file exists in the CWD
-        if (!file.exists()) {
-            System.out.print("No commit with that id exists.");
-        }
-
         // Assert the commit exists in .gitlet/commits
-        File commitFile = join(CWD, ".gitlet", "commits", commitID);
+        File commitFile = join(COMMITS_DIR, commitID);
         if (!commitFile.exists()) {
             System.out.print("No commit with that id exists.");
         }
@@ -60,10 +54,11 @@ public class CheckoutMethod {
         // Get the file in the commit
         HashMap trackedFiles = commitOpened.getTrackedFiles();
         String blobID = (String) trackedFiles.get(fileName);
-        File blob = join(CWD, ".gitlet", "blobs", blobID);
+        File blob = join(BLOBS_DIR, blobID);
 
         // Write over the file in the CWD
-        writeContents(file, blob);
+        String blobString = readContentsAsString(blob);
+        writeContents(file, blobString);
 
     }
 
@@ -82,7 +77,7 @@ public class CheckoutMethod {
         Commit branchNameCommitOpened = Utils.readObject(branchNameCommit, Commit.class);
 
         /* Failure 2: if already on the given branch -- exit */
-        if (currentBranch == branchName) {
+        if (readContentsAsString(CURRENT_BRANCH).equals(branchName)) {
             System.out.println("No need to checkout the current branch.");
             return;
         }
@@ -145,7 +140,7 @@ public class CheckoutMethod {
         writeObject(headFile, branchNameCommitOpened);
 
         // Edit current branch value to new branch name
-        currentBranch = branchName;
+        writeContents(CURRENT_BRANCH, branchName);
 
     }
 

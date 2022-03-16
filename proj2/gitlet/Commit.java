@@ -13,39 +13,38 @@ import static gitlet.Utils.*;
 
 public class Commit implements Serializable {
 
-    private String message;
-    private Instant time;
-    private String firstParent;
-    private String secondParent;
-    private HashMap trackedFiles; // Files updated in this commit
-    private HashMap removedFiles; // Files removed in this commit
-    private HashMap superFiles; // A map of ALL files and their latest versions
+    public String message;
+    public Instant time;
+    public String firstParent;
+    public String secondParent;
+    public HashMap trackedFiles; // Files updated in this commit
+    public HashMap removedFiles; // Files removed in this commit
+    public HashMap superFiles; // A map of ALL files and their latest versions
 
     // Constructor
-    public Commit (String message, String parentCommit, String secondParentCommit) {
+    public Commit (String message, String parentID, String secondParentID) {
 
         this.message = message;
         this.trackedFiles = new HashMap();
         this.superFiles = new HashMap();
         this.removedFiles = new HashMap();
-        if (firstParent == null) {
+
+        // Mother commit base case
+        if (parentID == null && secondParentID == null) {
             this.time = Instant.EPOCH;
             this.firstParent = null;
             this.secondParent = null;
-        } else if (secondParent == null) {
-            this.time = Instant.now();
-            this.firstParent = parentCommit;
-            this.secondParent = null;
         } else {
             this.time = Instant.now();
-            this.firstParent = parentCommit;
-            this.secondParent = secondParentCommit;
-        }
-            // Copy parents superFiles hashmap
-            File parentCommitFile = join(COMMITS_DIR, firstParent);
+            this.firstParent = parentID;
+            this.secondParent = secondParentID;
+            // Copy parent super files hashmap
+            File parentCommitFile = join(COMMITS_DIR, parentID);
             Commit parentCommitObject = readObject(parentCommitFile, Commit.class);
-            HashMap parentSuperFiles = parentCommitObject.superFiles;
+            HashMap parentSuperFiles = parentCommitObject.getSuperFiles();
             this.superFiles.putAll(parentSuperFiles);
+        }
+
     }
 
     public String getFirstParent() {

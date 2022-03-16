@@ -20,7 +20,7 @@ public class Repository {
     public static final File BRANCHES_DIR = join(CWD, ".gitlet", "branches");
     public static final File MASTER = join(CWD, ".gitlet", "branches", "master");
     public static final File HEAD = join(CWD, ".gitlet", "branches", "head");
-    public static String currentBranch;
+    public static final File CURRENT_BRANCH = join(BRANCHES_DIR, "current-branch");
 
     // Constructor
     public static void setupPersistence() throws IOException {
@@ -35,7 +35,8 @@ public class Repository {
             BRANCHES_DIR.mkdirs();
             MASTER.createNewFile();
             HEAD.createNewFile();
-            currentBranch = "master";
+            CURRENT_BRANCH.createNewFile();
+            writeContents(CURRENT_BRANCH, "master");
             setUpMotherCommit();
             setUpStaging();
         } else {
@@ -51,9 +52,8 @@ public class Repository {
         File file2 = HEAD;
         File file3 = MASTER;
         writeObject(file, motherCommitObject);
-        writeObject(file2, motherCommitObject);
-        writeObject(file3, motherCommitObject);
-
+        writeContents(file2, motherSHA);
+        writeContents(file3, motherSHA);
     }
 
     // Initiate staging maps

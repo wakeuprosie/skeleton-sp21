@@ -5,7 +5,7 @@ import java.util.*;
 
 import static gitlet.CommitMethod.commitMethod;
 import static gitlet.Repository.*;
-import static gitlet.AddMethod.*;
+import static gitlet.StagingMethod.*;
 import static gitlet.Utils.*;
 
 public class MergeMethod {
@@ -46,11 +46,11 @@ public class MergeMethod {
     // Automatic commit
     public static void merge(String inputBranchName) {
 
-        File currentBranchFile = join(BRANCHES_DIR, currentBranch);
+        File currentBranchFile = CURRENT_BRANCH;
         File inputBranchFile = join(BRANCHES_DIR, inputBranchName);
 
         // Failure: check if you're currently on the input branch -- exit
-        if (currentBranch.equals(inputBranchName)) {
+        if (readContentsAsString(CURRENT_BRANCH).equals(inputBranchName)) {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
@@ -168,8 +168,8 @@ public class MergeMethod {
         }
 
         /* Call commit method at the very end */
-        String string = "Merged " + currentBranch + "into " + inputBranchName;
-        commitMethod(string, sha1(serialize(inputBranchCommit)));
+        /*String string = "Merged " + currentBranch + "into " + inputBranchName;
+        commitMethod(string, sha1(serialize(inputBranchCommit)));*/
 
     }
 }

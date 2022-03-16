@@ -14,15 +14,16 @@ public class LogMethod {
 
     public static void log() {
         // Access the head commit
-        File headFile = HEAD;
+        File headFile = join(COMMITS_DIR, readContentsAsString(HEAD));
+        String headCommitID = readContentsAsString(HEAD);
         Commit headCommit = readObject(headFile, Commit.class);
 
         // Check if you're at initial commit
-        helper(headCommit);
+        helper(headCommit, headCommitID);
 
     }
 
-    private static void helper(Commit object) {
+    private static void helper(Commit object, String ID) {
 
         if (object == null) {
             return;
@@ -30,7 +31,7 @@ public class LogMethod {
 
         // Print commit ID
         System.out.println("===");
-        System.out.println("commit " + sha1(serialize(object)));
+        System.out.println("commit " + ID);
 
        /* ===
         commit e881c9575d180a215d1a636545b8fd9abfb1d2bb
@@ -47,14 +48,19 @@ public class LogMethod {
         System.out.println(object.getMessage());
         System.out.println();
 
-        // Access the parent commit to prep for recursion
-        String parentCommitID = object.getFirstParent();
+        // Special print case for merge commits
+        if (object.secondParent != null) {
+            String firstParent = object.firstParent;
+            String secondParent = object.secondParent;
+            System.out.println("Merge: " + 	firstParent.substring(0, 5) + " " + secondParent.substring(0, 5));
+        }
 
         // Recurse, passing in the parent commit, as long as parent is not null
+        String parentCommitID = object.firstParent;
         if (parentCommitID != null) {
             File blob = join(COMMITS_DIR, parentCommitID);
             Commit parentCommit = readObject(blob, Commit.class);
-            helper(parentCommit);
+            helper(parentCommit, parentCommitID);
         }
 
     }

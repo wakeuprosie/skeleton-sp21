@@ -11,44 +11,33 @@ import static gitlet.Utils.*;
  * Command: add
  * Input: one arg of file name */
 
-public class AddMethod {
+public class StagingMethod {
 
-    public static void add(String arg) throws IOException {
-
-        // Access the file of interest in cwd
-        File currentFile = Utils.join(CWD, arg);
+    public static void stage(String arg) throws IOException {
 
         // Failure: check file exists on computer
-        if (!currentFile.exists()) { //
+        if (!Utils.join(CWD, arg).exists()) { //
             System.out.println("File does not exist.");
             return;
         }
 
-        // Create a sha to represent current state of file
-        // Save the content in blobs folder, using sha as the pathname
-        String fileID = sha1(serialize(currentFile));
-
+        // Save the file content in blobs folder
+        File fileInCWD = join(CWD, arg);
+        String fileID = sha1(serialize(readContents(fileInCWD)));
         File newBlobFile = Utils.join(BLOBS_DIR, fileID);
         newBlobFile.createNewFile();
-        writeContents(newBlobFile, readContents(currentFile));
+        writeContents(newBlobFile, readContentsAsString(Utils.join(CWD, arg)));
 
         // Add filename : sha to staging-for-add hashmap
-        // Access, edit, and re-save staging hashmap
         File file = STAGING;
         HashMap staging = readObject(file, HashMap.class);
-        if (!staging.containsKey(arg)) {
-            staging.put(arg, fileID);
-        } else {
-            staging.replace(arg, fileID);
-        }
+        staging.put(arg, fileID);
         writeObject(file, staging);
     }
-
     /** Output:
      * New file in blobs with saved file - file name is the sha ID
      * New (or updated) key:value pair in staging hashmap (key:value == filename:fileSHAID)
      */
-
 
     /* Special version of staging for add for use with merge
     Difference from above: uses specific version of file rather than what's on cwd
@@ -83,8 +72,5 @@ public class AddMethod {
         writeObject(file, stagingRM); // Save staging hashmap back into staging folder file
 
     }
-
-
-
 
 }

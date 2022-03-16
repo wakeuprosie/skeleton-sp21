@@ -3,8 +3,8 @@ package gitlet;
 import java.io.File;
 
 import static gitlet.Repository.BRANCHES_DIR;
-import static gitlet.Utils.join;
-import static gitlet.Utils.restrictedDelete;
+import static gitlet.Repository.CURRENT_BRANCH;
+import static gitlet.Utils.*;
 
 /** This class handles the logic for rm-branch
  * Command: rm-branch
@@ -23,7 +23,7 @@ public class RmBranchMethod {
         }
 
         /* Failure: can't remove branch if currently on this branch */
-        if (Repository.currentBranch.equals(branchName)) {
+        if (readContentsAsString(CURRENT_BRANCH).equals(branchName)) {
             System.out.println("Cannot remove the current branch.");
             return;
         }

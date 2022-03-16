@@ -31,7 +31,7 @@ public class Main {
             case "add":
                 validateMinNumArgs("add", args, 1);
                 for (int i = 1; i < args.length; i += 1) {
-                    gitlet.AddMethod.add(args[i]);
+                    gitlet.StagingMethod.stage(args[i]);
                 }
                 break;
             case "commit":
@@ -48,7 +48,7 @@ public class Main {
                     CheckoutMethod.method1(args[2]);
                 } else if (args.length == 4) {
                     validateMinNumArgs("checkout", args, 4);
-                    CheckoutMethod.method2(args[2], args[3]);
+                    CheckoutMethod.method2(args[1], args[3]);
                 } else {
                     validateMinNumArgs("checkout", args, 2);
                     CheckoutMethod.method3(args[1]);

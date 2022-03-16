@@ -31,7 +31,6 @@ class Utils {
     /** The length of a complete SHA-1 UID as a hexadecimal numeral. */
     static final int UID_LENGTH = 40;
 
-
     /* SHA-1 HASH VALUES. */
 
     /** Returns the SHA-1 hash of the concatenation of VALS, which may
@@ -64,7 +63,6 @@ class Utils {
         return sha1(vals.toArray(new Object[vals.size()]));
     }
 
-
     /* FILE DELETION */
 
     /** Deletes FILE if it exists and is not a directory.  Returns true
@@ -89,7 +87,6 @@ class Utils {
     static boolean restrictedDelete(String file) {
         return restrictedDelete(new File(file));
     }
-
 
     /* READING AND WRITING FILE CONTENTS */
 
@@ -122,10 +119,10 @@ class Utils {
         try {
             if (file.isDirectory()) {
                 throw
-                    new IllegalArgumentException("cannot overwrite directory");
+                        new IllegalArgumentException("cannot overwrite directory");
             }
             BufferedOutputStream str =
-                new BufferedOutputStream(Files.newOutputStream(file.toPath()));
+                    new BufferedOutputStream(Files.newOutputStream(file.toPath()));
             for (Object obj : contents) {
                 if (obj instanceof byte[]) {
                     str.write((byte[]) obj);
@@ -145,12 +142,12 @@ class Utils {
                                                  Class<T> expectedClass) {
         try {
             ObjectInputStream in =
-                new ObjectInputStream(new FileInputStream(file));
+                    new ObjectInputStream(new FileInputStream(file));
             T result = expectedClass.cast(in.readObject());
             in.close();
             return result;
         } catch (IOException | ClassCastException
-                 | ClassNotFoundException excp) {
+                | ClassNotFoundException excp) {
             throw new IllegalArgumentException(excp.getMessage());
         }
     }
@@ -160,17 +157,16 @@ class Utils {
         writeContents(file, serialize(obj));
     }
 
-
     /* DIRECTORIES */
 
     /** Filter out all but plain files. */
     private static final FilenameFilter PLAIN_FILES =
-        new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return new File(dir, name).isFile();
-            }
-        };
+            new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return new File(dir, name).isFile();
+                }
+            };
 
     /** Returns a list of the names of all plain files in the directory DIR, in
      *  lexicographic order as Java Strings.  Returns null if DIR does
@@ -191,7 +187,6 @@ class Utils {
     static List<String> plainFilenamesIn(String dir) {
         return plainFilenamesIn(new File(dir));
     }
-
 
     /* OTHER FILE UTILITIES */
 
@@ -224,6 +219,7 @@ class Utils {
             throw error("Internal error serializing commit.");
         }
     }
+
 
 
     /* MESSAGES AND ERROR REPORTING */
