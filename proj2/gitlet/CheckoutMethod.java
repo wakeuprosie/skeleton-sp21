@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
@@ -63,7 +64,7 @@ public class CheckoutMethod {
     }
 
     /* Input: [branch name] */
-    public static void method3(String branchName) {
+    public static void method3(String branchName) throws IOException {
 
         // Open the newest commit at given branch for access
         File branchNameCommit = Utils.join(BRANCHES_DIR, branchName);
@@ -74,7 +75,8 @@ public class CheckoutMethod {
             System.out.print("No such branch exists.");
             return;
         }
-        Commit branchNameCommitOpened = Utils.readObject(branchNameCommit, Commit.class);
+
+        Commit branchNameCommitOpened = readObject(join(COMMITS_DIR, readContentsAsString(branchNameCommit)), Commit.class);
 
         /* Failure 2: if already on the given branch -- exit */
         if (readContentsAsString(CURRENT_BRANCH).equals(branchName)) {
@@ -83,17 +85,15 @@ public class CheckoutMethod {
         }
 
         /* Failure 3: if there is a file in the CWD but NOT in input branch */
-        File cwdDir = CWD;
-        List<String> cwdList = plainFilenamesIn(cwdDir);
-
-        HashMap branchNameCommitHash = branchNameCommitOpened.getSuperFiles();
+        List<String> cwdList = plainFilenamesIn(CWD);
 
         Iterator cwdListIterator = cwdList.iterator();
 
+        HashMap currentHeadCommitHash = readObject(join(COMMITS_DIR, readContentsAsString(HEAD)), Commit.class).superFiles;
         while (cwdListIterator.hasNext()) {
             String fileName = (String) cwdListIterator.next();
 
-            if (!branchNameCommitHash.containsKey(fileName)) {
+            if (!currentHeadCommitHash.containsKey(fileName)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
             }
@@ -109,13 +109,22 @@ public class CheckoutMethod {
         // Iterator for this set
         Iterator<String> itr = allSuperFileNames.iterator();
 
-        // For every file created up to this commit, overwrite the file in CWD with the version in the set
+        // Replace all the files in the CWD with the version saved in this branch's head commit
         while (itr.hasNext()) {
             String key = itr.next();
             String shavalue = (String) superFiles.get(key);
             File fileToOverwrite = join(CWD, key);
-            File blob = join(BLOBS_DIR, shavalue);
-            writeContents(blob, fileToOverwrite);
+            // If file exist in CWD, override it
+            if (fileToOverwrite.exists()) {
+                File blob = join(BLOBS_DIR, shavalue);
+                writeContents(fileToOverwrite, readContentsAsString(blob));
+            } else {
+                // If file does not exist in CWD, create it
+                File newFile = join(CWD, key);
+                newFile.createNewFile();
+                File blob = join(BLOBS_DIR, shavalue);
+                writeContents(newFile, readContentsAsString(blob));
+            }
         }
 
         // Delete every file currently in CWD but not in set
@@ -137,7 +146,8 @@ public class CheckoutMethod {
 
         // Edit HEAD pointer to the branch name commit
         File headFile = HEAD;
-        writeObject(headFile, branchNameCommitOpened);
+        String commitID = readContentsAsString(branchNameCommit);
+        writeContents(headFile, commitID);
 
         // Edit current branch value to new branch name
         writeContents(CURRENT_BRANCH, branchName);

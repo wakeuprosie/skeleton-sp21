@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import static gitlet.CommitMethod.commitMethod;
@@ -44,7 +45,7 @@ public class MergeMethod {
     }
 
     // Automatic commit
-    public static void merge(String inputBranchName) {
+    public static void merge(String inputBranchName) throws IOException {
 
         File currentBranchFile = CURRENT_BRANCH;
         File inputBranchFile = join(BRANCHES_DIR, inputBranchName);
@@ -168,8 +169,8 @@ public class MergeMethod {
         }
 
         /* Call commit method at the very end */
-        /*String string = "Merged " + currentBranch + "into " + inputBranchName;
-        commitMethod(string, sha1(serialize(inputBranchCommit)));*/
+        String string = "Merged " + readContentsAsString(CURRENT_BRANCH) + " into " + inputBranchName;
+        commitMethod(string);
 
     }
 }

@@ -30,6 +30,6 @@ public class RmBranchMethod {
 
         /* BODY */
         // Delete the branch file
-        restrictedDelete(branchFile);
+        branchFile.delete();
     }
 }
