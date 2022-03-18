@@ -18,6 +18,18 @@ public class TestBSTMap {
 	    }
     }
 
+    @Test
+    public void basicTest() {
+        BSTMap<Integer, Integer> b = new BSTMap<Integer, Integer>();
+        for (int i = 0; i < 10; i++) {
+            b.put(i, 1+i);
+            //make sure put is working via containsKey and get
+            assertTrue(null != b.get(i));
+            assertTrue(b.get(i).equals(1+i));
+            assertTrue(b.containsKey(i));
+        }
+    }
+
     //assumes put/size/containsKey/get work
     @Test
     public void sanityClearTest() {
@@ -25,7 +37,7 @@ public class TestBSTMap {
         for (int i = 0; i < 455; i++) {
             b.put("hi" + i, 1+i);
             //make sure put is working via containsKey and get
-            assertTrue( null != b.get("hi" + i) && (b.get("hi"+i).equals(1+i))
+            assertTrue(null != b.get("hi" + i) && (b.get("hi"+i).equals(1+i))
                         && b.containsKey("hi" + i));
         }
         assertEquals(455, b.size());
