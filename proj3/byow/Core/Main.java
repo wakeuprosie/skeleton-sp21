@@ -10,6 +10,7 @@ public class Main {
             System.out.println("Can only have two arguments - the flag and input string");
             System.exit(0);
         } else if (args.length == 2 && args[0].equals("-s")) {
+            // #1 game play: generates an Engine object and lets you interact with it via terminal
             Engine engine = new Engine();
             engine.interactWithInputString(args[1]);
             System.out.println(engine.toString());
@@ -17,6 +18,7 @@ public class Main {
         } else if (args.length == 2 && args[0].equals("-p")) { System.out.println("Coming soon."); } 
         // DO NOT CHANGE THESE LINES YET ;)
         else {
+            // #2 game play: generates an Engine object and lets you interact with it via keyboard
             Engine engine = new Engine();
             engine.interactWithKeyboard();
         }
