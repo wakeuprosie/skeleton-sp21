@@ -6,58 +6,70 @@ import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
-import java.util.Random;
 
 /**
  * Draws a world consisting of hexagonal regions.
  */
 public class HexWorld {
 
-    // Making some changes for git
-    // Create a hexagon with sides length S and add it to a position in the world
-    public static void addHexagon(int S) {
+    public static TETile[][] addHexagon(int s) {
 
-        int left, right;
-        int content = S;
-        left = right = S - 1;
+        // grid size
+        int width = (s * 2) + (s - 2);
+        int height = s * 2;
+
+        // initialize a 2D array to hold the hexagon
+        TETile[][] hexagon = new TETile[width][height];
+        for (int x = 0; x < width; x += 1) {
+            for (int y = 0; y < height; y += 1) {
+                hexagon[x][y] = Tileset.NOTHING;
+            }
+        }
+
+        // bottom half
+        for (int y = 0; y < s; y += 1) { // loop over rows
+
+            int startC = s - 1 - (1 * y); // starting index x to fill
+            int content = s + (2 * y); // # of tiles to fill
+
+            while (content != 0) { // fill tiles in this row
+                hexagon[startC][y] = Tileset.FLOWER;
+                startC += 1;
+                content -= 1;
+            }
+        }
 
         // top half
-        for (int i = 1; i <= S; i += 1) {
-            for (int j = left; j > 0; j -= 1) {
-                System.out.print(" ");
+        int i = 0;
+        int h = (s - 1);
+        for (int y = s; y < (2 * s); y += 1) {
+            int startC = 0 + (1 * i);
+            int content = s + (2 * h);
+            while (content != 0) {
+                hexagon[startC][y] = Tileset.FLOWER;
+                startC += 1;
+                content -= 1;
             }
-            for (int h = content; h > 0; h -= 1) {
-                System.out.print("a");
-            }
-            for (int k = right; k > 0; k -= 1) {
-                System.out.print(" ");
-            }
-            System.out.println();
-            left = right -= 1;
-            content += 2;
+            i += 1;
+            h -= 1;
         }
 
-        // bottom half idk
-        left = right = 0;
-        content -= 2;
-        for (int i = S; i > 0; i -= 1) {
-            for (int j = left; j > 0; j -= 1) {
-                System.out.print(" ");
-            }
-            for (int h = content; h > 0; h -= 1) {
-                System.out.print("a");
-            }
-            for (int k = right; k > 0; k -= 1) {
-                System.out.print(" ");
-            }
-            left = right += 1;
-            content -= 2;
-            System.out.println();
-        }
+        return hexagon;
+
     }
 
+
     public static void main(String[] args) {
-        addHexagon(3);
+
+        // Tile rendering engine
+        TERenderer ter = new TERenderer();
+        ter.initialize(10, 8); // Hard code for a world with 19 hexagons, each of size 3
+
+        TETile[][] hexagon = addHexagon(3);
+
+        // Fill in a hexagon
+        ter.renderFrame(hexagon);
+
     }
 
 }
